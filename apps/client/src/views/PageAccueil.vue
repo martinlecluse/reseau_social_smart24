@@ -21,6 +21,14 @@ const switchShowCreateNewPost = () => {
     showCreateNewPost.value = !showCreateNewPost.value;
 }
 
+const handleNewPostStatus = (status: string) => {
+    if (status === 'success') {
+      switchShowCreateNewPost();
+    } else {
+        alert('An error occurred while posting your message');
+    }
+}
+
 onMounted(async () => {
     let userInfo = store.getUserInfo;
 
@@ -41,7 +49,11 @@ onMounted(async () => {
 
 //Function to get posts
 async function getPosts() {
-    return [];
+    const idPost = "66335387450595a99959e21d";
+    const idPost2="663353db450595a99959e223";
+    const response = await axios.get(`/posts/${idPost}`);
+    const response2 = await axios.get(`/posts/${idPost2}`);
+    return [response.data, response2.data];
 }
 
 
@@ -56,7 +68,7 @@ async function getPosts() {
             <button class="btn btn-primary b" @click="switchShowCreateNewPost">Post</button>
             <feed :posts="posts"></feed>
             <modal v-if="showCreateNewPost" @close="switchShowCreateNewPost">
-                <NewPost @postStatus="handlePostStatus"/>
+                <NewPost @postStatus="handleNewPostStatus"/>
             </modal>
         </div>
     </div>

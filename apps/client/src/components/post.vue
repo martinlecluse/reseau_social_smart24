@@ -2,6 +2,8 @@
 import axios from "axios";
 import { ref, onMounted } from "vue";
 import { useUserInfoStore } from "../stores/userInfo";
+import NewFactCheck from "./NewFactCheck.vue";
+import modal from "../components/pop-ups/modal.vue";
 
 const props = defineProps({
     info: {
@@ -12,9 +14,9 @@ const props = defineProps({
         text: String,
     }
 });
-
+console.log("info = ",props.info);
 const store = useUserInfoStore();
-const userInfo = useUserInfoStore.getUserInfo;
+const userInfo = store.getUserInfo;
 const userIsFactChecker = userInfo.isFactChecker === "true" ? true : false;
 
 const metric = ref('');
@@ -29,6 +31,20 @@ const month = dateInstance.getMonth();
 const day = dateInstance.getDate();
 const hour = dateInstance.getHours();
 const minute = dateInstance.getMinutes();
+
+const showFactChecks = ref(false)
+
+const switchShowFactChecks = () => {
+    showFactChecks.value = !showFactChecks.value;
+}
+
+const handleNewFactCheckStatus = (status) => {
+    if (status === 'success') {
+        switchShowFactChecks();
+    } else {
+        alert('An error occurred while posting your message');
+    }
+}
 
 onMounted(async () => {
     metric.value = await getMetrics();
@@ -63,11 +79,6 @@ async function untrustPost() {
     await axios.post(`/posts/${props.info._id}/metrics/untrust`);
     metric.value = await getMetrics();
     checkIfUserHasLiked(metric.value);
-}
-
-async function factCheckPost() {
-    await axios.post("/factCheck/create")
-    metric.value = await getMetrics();
 }
 
 function checkIfUserHasLiked(list) {
@@ -125,12 +136,12 @@ function checkIfUserHasLiked(list) {
             <div class="post-content">
                 <p class="std"> {{info.text}}
                 </p>
-                <img v-if="post.image" :src="post.image" alt="post-image" class="post-image">
+                <img v-if="props.info.image" :src="props.info.image" alt="post-image" class="post-image">
             </div>
             <div class="post-footer">
                 <div class="post-footer-left"> 
                     <div v-if="userIsFactChecker" class="comment-icon-container">          
-                        <button  class="material-symbols-outlined button-post" @click="factCheckPost">
+                        <button  class="material-symbols-outlined button-post" @click="switchShowFactChecks">
                             verified
                         </button> 
                         <div class="comment-count-bubble">{{metric.nbFactChecks}}</div>
@@ -185,7 +196,12 @@ function checkIfUserHasLiked(list) {
         </div>
     </div>
     <div v-if="loadComments">
-        <modal><FeedComment :parentPostId="post._id"></FeedComment></modal>
+        <modal><FeedComment :parentPostId="props.info._id"></FeedComment></modal>
+    </div>
+    <div v-if="showFactChecks">
+        <modal @close="switchShowFactChecks">
+            <NewFactCheck :parentPostId="props.info._id" @postStatus="handleNewFactCheckStatus"></NewFactCheck>
+        </modal>
     </div>
 
 
