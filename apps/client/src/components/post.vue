@@ -2,8 +2,9 @@
 import axios from "axios";
 import { ref, onMounted } from "vue";
 import { useUserInfoStore } from "../stores/userInfo";
-import NewFactCheck from "./NewFactCheck.vue";
 import modal from "../components/pop-ups/modal.vue";
+import FeedFactCheck from "./FeedFactCheck.vue";
+import FeedComment from "./FeedComment.vue"
 
 const props = defineProps({
     info: {
@@ -32,13 +33,14 @@ const day = dateInstance.getDate();
 const hour = dateInstance.getHours();
 const minute = dateInstance.getMinutes();
 
-const showFactChecks = ref(false)
+const showFactChecks = ref(false);
+const loadComments = ref(false);
 
 const switchShowFactChecks = () => {
     showFactChecks.value = !showFactChecks.value;
 }
 
-const handleNewFactCheckStatus = (status) => {
+const handleFactCheckStatus = (status) => {
     if (status === 'success') {
         switchShowFactChecks();
     } else {
@@ -134,7 +136,7 @@ function checkIfUserHasLiked(list) {
 
             </div>
             <div class="post-content">
-                <p class="std"> {{info.text}}
+                <p class="std"> {{props.info.text}}
                 </p>
                 <img v-if="props.info.image" :src="props.info.image" alt="post-image" class="post-image">
             </div>
@@ -200,7 +202,11 @@ function checkIfUserHasLiked(list) {
     </div>
     <div v-if="showFactChecks">
         <modal @close="switchShowFactChecks">
-            <NewFactCheck :parentPostId="props.info._id" @postStatus="handleNewFactCheckStatus"></NewFactCheck>
+            <FeedFactCheck 
+                :parentPostId="props.info._id" 
+                :userIsFactChecker="userIsFactChecker" 
+                @postStatus="handleFactCheckStatus">
+            </FeedFactCheck>
         </modal>
     </div>
 
