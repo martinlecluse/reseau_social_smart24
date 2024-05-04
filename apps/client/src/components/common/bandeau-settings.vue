@@ -20,7 +20,7 @@ const redirectHomePage = () => {
         <AppLogo/>
         <p class="info-user std title3">{{ props.username }}</p>
         <div class="right-box">
-            <button class="btn btn-primary b" @click="redirectHomePage">Back</button>
+            <button class="button" @click="redirectHomePage">Back</button>
         </div>
     </nav>
 

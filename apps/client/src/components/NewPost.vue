@@ -1,7 +1,7 @@
 <template>
     <div>
       <textarea v-model="message" placeholder="Write your post here..."></textarea>
-      <button @click="postMessage">Post</button>
+      <button @click="postMessage" class="button">Post</button>
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     </div>
 </template>

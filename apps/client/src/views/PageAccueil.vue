@@ -6,7 +6,7 @@ import { useUserInfoStore } from "../stores/userInfo";
 import axios from "axios";
 import { onMounted, ref } from "vue";
 import BandeauHomepage from "../components/common/BandeauHomepage.vue";
-import modal from "../components/common/modal.vue";
+import modal from "../components/pop-ups/modal.vue";
 import NewPost from "../components/NewPost.vue";
 
 const loadFeed = ref(false);
@@ -59,7 +59,7 @@ const handlePostStatus = (status: string) => {
             <BandeauHomepage :username="username"/>
         </header>
         <div class="screen">
-            <button class="btn btn-primary b" @click="switchShowCreateNewPost">Post</button>
+            <button class="button" @click="switchShowCreateNewPost">Post</button>
             <feed :posts="posts"></feed>
             <modal v-if="showCreateNewPost" @close="switchShowCreateNewPost">
                 <NewPost @postStatus="handlePostStatus"/>

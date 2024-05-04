@@ -20,7 +20,7 @@ const props = defineProps([
             </a>
         </li>
         <li>
-            <button class="btn btn-primary b">Réglages</button>
+            <button class="button">Réglages</button>
         </li>
     </nav>
 

@@ -100,7 +100,7 @@ onMounted(async () => {
                                     <button class="btn btn-primary" id="not-selected" @click="updateFactCheckRate(100, $event)">100</button>
                                 </div>
                             </div>
-                            <div class="validate-button"><button class="btn btn-primary" @click="updateUserParams">Valider</button></div>
+                            <div class="validate-button"><button class="button" @click="updateUserParams">Valider</button></div>
                         </div>
                         <div class="select-param">
                             <p class="std text accent-bold">Diversity of the feed : {{ userData.parameters.rateDiversification }} %</p>
@@ -120,7 +120,7 @@ onMounted(async () => {
                                     <button class="btn btn-primary" id="not-selected" @click="updateDiversityRate(100, $event)">100</button>
                                 </div>
                             </div>
-                            <div class="validate-button"><button class="btn btn-primary" @click="updateUserParams">Valider</button></div>
+                            <div class="validate-button"><button class="button" @click="updateUserParams">Valider</button></div>
                         </div>
                     </div>
                 </div>
