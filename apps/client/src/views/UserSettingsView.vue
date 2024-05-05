@@ -7,7 +7,7 @@ import  { ref } from 'vue'
 import { useTokenStore } from '../stores/auth'
 import { authHeader } from "@/utils/auth";
 import { computed } from "vue";
-import BandeauSettings from "@/components/common/bandeau-settings.vue";
+import AppHeader from "@/components/common/AppHeader.vue";
 
 const loaded = ref(false);
 
@@ -62,8 +62,9 @@ onMounted(async () => {
 </script>
 
 <template>
+    <AppHeader></AppHeader>
+
     <div class="content">
-        <BandeauSettings :username="userData.username" :firstname="userData.name" :lastname="userData.surname"></BandeauSettings>
         <div v-if="loaded" class="panel profile">
             <div class="info">
                 <h1 class="std title1">Profile</h1>
@@ -138,6 +139,7 @@ onMounted(async () => {
     align-items: center;
 
     width: 100%;
+    padding-top: 70px;
 }
 
 .info {

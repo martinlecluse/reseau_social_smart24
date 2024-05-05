@@ -34,6 +34,7 @@ header {
     width: 100%;
     padding: 0 24px;
     z-index: 100;
+    border-bottom: solid 1px rgb(231, 231, 231);
 }
 
 .identity {
