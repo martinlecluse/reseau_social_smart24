@@ -212,7 +212,7 @@ h1, h2, h3, h4, h5, h6, p {
     font-family: 'inter', sans-serif;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 24px;
 }
 
 .post-footer {

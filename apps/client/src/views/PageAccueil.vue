@@ -4,12 +4,14 @@ import feed from "../components/common/feed.vue"
 import { useUserInfoStore } from "../stores/userInfo";
 import axios from "axios";
 import { onMounted, ref } from "vue";
-import BandeauHomepage from "../components/common/BandeauHomepage.vue";
-import modal from "../components/pop-ups/modal.vue";
-import NewPost from "../components/NewPost.vue";
+import AppHeader from "@/components/common/AppHeader.vue";
+import modal from "@/components/pop-ups/modal.vue";
+import NewPost from "@/components/NewPost.vue";
+import { useTokenStore } from '@/stores/auth';
 
 const loadFeed = ref(false);
 
+const tokenStore = useTokenStore();
 const store = useUserInfoStore();
 
 const userId = ref('')
@@ -28,6 +30,11 @@ const handleNewPostStatus = (status: string) => {
     } else {
         alert('An error occurred while posting your message');
     }
+}
+
+const logout = () => {
+    tokenStore.logout();
+    window.location.href = '/login';
 }
 
 onMounted(async () => {
@@ -49,38 +56,58 @@ onMounted(async () => {
 </script>
 
 <template>
+    <AppHeader>
+        <template v-slot:nav>
+            <router-link to="/settings">
+                <button class="btn btn-primary b">Settings</button>
+            </router-link>
+            <button class="btn btn-primary b" @click="logout">Logout</button>
+        </template>
+    </AppHeader>
+
     <div class="mainFeed">
-        <header>        
-            <BandeauHomepage :username="username"/>
-        </header>
-        <div class="screen">
-            <button class="btn btn-primary b" @click="switchShowCreateNewPost">Post</button>
+        <main>
+            <div class="options">
+                <button class="btn btn-primary b" @click="switchShowCreateNewPost">
+                    Create a new post
+                </button>
+            </div>
+
             <feed v-if="loadFeed" :posts="posts" :isFactChecker="userIsFactChecker"></feed>
-            <modal v-if="showCreateNewPost" @close="switchShowCreateNewPost">
-                <NewPost @postStatus="handleNewPostStatus"/>
-            </modal>
-        </div>
+        </main>
     </div>
+
+    <modal v-if="showCreateNewPost" @close="switchShowCreateNewPost">
+        <NewPost @postStatus="handleNewPostStatus"/>
+    </modal>
 </template>
 
 <style scoped>
+
 .mainFeed{
     width:100%;
     height:100vh;
+    padding-top: 70px;
     display: flex;
     flex-direction: column;
     align-items: center;
     overflow: auto;
-background-image: linear-gradient(to bottom, #f7e1e1 50%, #B9ABAB 100%);
+    background-image: linear-gradient(to bottom, #f7e1e1 50%, #B9ABAB 100%);
 }
 
-
-.screen{
-    width: 100%;
-    height: 100%;
-    margin-top:7vh;
-    display:flex;
-    justify-content: center;
-    padding: 1em 0 1em 0;
+main {
+    margin: 0 auto;
+    padding: 24px 12px;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
 }
+
+.options {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
 </style>
