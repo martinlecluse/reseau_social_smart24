@@ -177,7 +177,38 @@ async function unTrustUser(){
     border-left: 5px solid #dfdfdf;
     padding: 5px;
     width: auto;
-    word-wrap: break-word;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .trust:hover:after {
+    color: black;
+    display: block;
+    content: "Trust user";
+    position: absolute;
+    background: #f8f8f8;
+    border-right: 5px solid #dfdfdf;
+    border-bottom: 5px solid #dfdfdf;
+    border-top: 5px solid #dfdfdf;
+    border-left: 5px solid #dfdfdf;
+    padding: 5px;
+    width: auto;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .untrust:hover:after {
+    color: black;
+    display: block;
+    content: "Untrust user";
+    position: absolute;
+    background: #f8f8f8;
+    border-right: 5px solid #dfdfdf;
+    border-bottom: 5px solid #dfdfdf;
+    border-top: 5px solid #dfdfdf;
+    border-left: 5px solid #dfdfdf;
+    padding: 5px;
+    width: auto;
     font-size: 14px;
     font-family: Arial, Helvetica, sans-serif;
   }
