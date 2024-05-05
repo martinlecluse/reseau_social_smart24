@@ -8,7 +8,7 @@ import { singleton } from 'tsyringe';
 import { AuthRequest, auth } from '../../middleware/auth';
 import { HttpException } from '../../models/http-exception';
 import { ICreateComment } from '../../models/comment';
-
+import { FactCheckService } from '../../services/factCheck-service/factCheck-service';
 import { IUser } from 'src/models/user';
 
 
