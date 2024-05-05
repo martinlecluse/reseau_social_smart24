@@ -6,6 +6,7 @@ import { HttpException } from '../../models/http-exception';
 import { MetricsService } from '../metrics-service/metrics-service';
 import { PostService } from '../post-service/post-service';
 import { UserService } from '../user-service';
+import { NonStrictObjectId } from 'src/utils/objectid';
 
 @singleton()
 export class FactCheckService {
@@ -57,5 +58,15 @@ export class FactCheckService {
         await this.metricsService.addFactCheck(metricsId, factCheck._id, factCheck.grade);
 
         return factCheck;
+    }
+
+    async getFactChecksByPost(postId: NonStrictObjectId): Promise<(Document & IFactCheck)[]> {
+        const factChecksQuery = FactCheck.find({ postId: postId })
+            .sort({ date: -1 })
+            .limit(50)
+            .populate('emittedBy', 'username _id');
+
+        const res = await factChecksQuery.exec();
+        return res;
     }
 }

@@ -22,6 +22,14 @@ const switchShowCreateNewPost = () => {
     showCreateNewPost.value = !showCreateNewPost.value;
 }
 
+const handleNewPostStatus = (status: string) => {
+    if (status === 'success') {
+      switchShowCreateNewPost();
+    } else {
+        alert('An error occurred while posting your message');
+    }
+}
+
 onMounted(async () => {
     let userInfo = store.getUserInfo;
 
@@ -37,6 +45,7 @@ onMounted(async () => {
         console.error("Erreur lors de la récupération des posts :", error);
     }
 });
+
 </script>
 
 <template>
@@ -48,7 +57,7 @@ onMounted(async () => {
             <button class="btn btn-primary b" @click="switchShowCreateNewPost">Post</button>
             <feed v-if="loadFeed" :posts="posts" :isFactChecker="userIsFactChecker"></feed>
             <modal v-if="showCreateNewPost" @close="switchShowCreateNewPost">
-                <NewPost @postStatus="handlePostStatus"/>
+                <NewPost @postStatus="handleNewPostStatus"/>
             </modal>
         </div>
     </div>
