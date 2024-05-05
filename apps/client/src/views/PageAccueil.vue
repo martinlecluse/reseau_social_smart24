@@ -85,7 +85,7 @@ onMounted(async () => {
 main {
     margin: 0 auto;
     padding: 24px 12px;
-    max-width: 800px;
+    max-width: 900px;
     display: flex;
     flex-direction: column;
     gap: 24px;

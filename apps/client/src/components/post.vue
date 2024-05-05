@@ -215,6 +215,10 @@ h1, h2, h3, h4, h5, h6, p {
     gap: 24px;
 }
 
+.post-content {
+    font-size: 0.9em;
+}
+
 .post-footer {
     display: flex;
     justify-content: space-between;
@@ -300,8 +304,8 @@ h1, h2, h3, h4, h5, h6, p {
 
 .post-date {
     margin: 0;
-    font-size: 0.9em;
-    opacity: 0.75;
+    font-size: 0.85em;
+    opacity: 0.65;
 }
 
 </style>
