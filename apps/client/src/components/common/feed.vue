@@ -5,15 +5,15 @@ import post from '../post.vue'
 
 const props = defineProps({
     posts: Array,
-    username: String,
+    isFactChecker: Boolean
 })
 
 </script>
 
 <template>
     <div class="feed">
-        <div class="posts" v-for="item in  props.posts" key="index">
-            <post :info="item"></post>
+        <div class="posts" v-for="(item, index) in  props.posts" :key="index">
+            <post :info="item" :userIsFactChecker="isFactChecker"></post>
         </div>
     </div>
 </template>

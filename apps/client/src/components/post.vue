@@ -2,23 +2,26 @@
 import axios from "axios";
 import { ref, onMounted } from "vue";
 import { useUserInfoStore } from "../stores/userInfo";
-import modal from "../components/pop-ups/modal.vue";
+import FeedComment from "./FeedComment.vue";
+import modal from "./pop-ups/modal.vue";
 import FeedFactCheck from "./FeedFactCheck.vue";
-import FeedComment from "./FeedComment.vue"
 
 const props = defineProps({
     info: {
-        date: Date,
+        _id: Object,
         createdBy: Object,
+        date: Date,
+        direct: Number,
         metrics: Object,
-        image: String,
         text: String,
-    }
+    },
+    userIsFactChecker: Boolean
 });
-console.log("info = ",props.info);
+
+
 const store = useUserInfoStore();
 const userInfo = store.getUserInfo;
-const userIsFactChecker = userInfo.isFactChecker === "true" ? true : false;
+const id = userInfo._id;
 
 const metric = ref('');
 const likedBy = ref(false);
@@ -53,6 +56,10 @@ onMounted(async () => {
     checkIfUserHasLiked(metric.value);
 });
 
+const openCommentsPanel = () => {
+    loadComments.value = true
+}
+
 async function getMetrics() {
     const res = await axios.get(`/posts/${props.info._id}/metrics`);
     return res.data;
@@ -84,11 +91,7 @@ async function untrustPost() {
 }
 
 function checkIfUserHasLiked(list) {
-    // Récupérer les informations de l'utilisateur
-    const userInfo = store.getUserInfo;
-    const id = userInfo._id;
     // Initialiser les indicateurs de like à false
-        
     likedBy.value=false;
     unlikedBy.value=false;
     trustedBy.value=false;
@@ -136,14 +139,13 @@ function checkIfUserHasLiked(list) {
 
             </div>
             <div class="post-content">
-                <p class="std"> {{props.info.text}}
-                </p>
-                <img v-if="props.info.image" :src="props.info.image" alt="post-image" class="post-image">
+                <p class="std"> {{info.text}}</p>
             </div>
             <div class="post-footer">
                 <div class="post-footer-left"> 
-                    <div v-if="userIsFactChecker" class="comment-icon-container">          
-                        <button  class="material-symbols-outlined button-post" @click="switchShowFactChecks">
+                    <div v-if="props.userIsFactChecker" class="comment-icon-container">          
+                        <button  class="material-symbols-outlined button-post" @click="factCheckPost">
+
                             verified
                         </button> 
                         <div class="comment-count-bubble">{{metric.nbFactChecks}}</div>
@@ -187,7 +189,7 @@ function checkIfUserHasLiked(list) {
                     </div>
 
                     <div class="comment-icon-container">
-                        <button class="material-symbols-outlined button-post">
+                        <button class="material-symbols-outlined button-post" @click="openCommentsPanel">
                         comment
                         </button>  
                         <div class="comment-count-bubble">{{metric.nbComments}}</div>
@@ -198,16 +200,8 @@ function checkIfUserHasLiked(list) {
         </div>
     </div>
     <div v-if="loadComments">
-        <modal><FeedComment :parentPostId="props.info._id"></FeedComment></modal>
-    </div>
-    <div v-if="showFactChecks">
-        <modal @close="switchShowFactChecks">
-            <FeedFactCheck 
-                :parentPostId="props.info._id" 
-                :userIsFactChecker="userIsFactChecker" 
-                @postStatus="handleFactCheckStatus">
-            </FeedFactCheck>
-        </modal>
+        <modal><FeedComment :parentPostId="info._id"></FeedComment></modal>
+
     </div>
 
 
