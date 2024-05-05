@@ -3,11 +3,12 @@ import { Document } from 'mongoose';
 import { singleton } from 'tsyringe';
 import { Comment, CommentDocument, ICreateComment } from '../../models/comment';
 import { HttpException } from '../../models/http-exception';
-import { Metrics } from '../../models/metrics';
+import { IMetrics, Metrics } from '../../models/metrics';
 import { ICreatePost, IPost, Post } from '../../models/post';
 import { NonStrictObjectId } from '../../utils/objectid';
 import { UserService } from '../user-service';
-import { AlgoSuggestion, IAlgoSuggestionOther } from '../../models/algo/algo-suggestion';
+import { AlgoSuggestion, IAlgoParams, IAlgoSuggestionOther } from '../../models/algo/algo-suggestion';
+import { ItemForComputation } from 'src/algo/algo-suggestion/algo-suggestions-computer';
 
 @singleton()
 export class PostService {
@@ -53,8 +54,8 @@ export class PostService {
         return comment;
     }
 
-    async getPost(postId: NonStrictObjectId): Promise<Document & IPost> {
-        const post = await Post.findOne({ _id: postId }).populate('createdBy', 'username _id').populate('metrics');
+    async getPost(postId: NonStrictObjectId): Promise<ItemForComputation> {
+        const post = await Post.findOne<ItemForComputation>({ _id: postId }).populate('createdBy', 'username _id').populate('metrics');
 
         if (!post) {
             throw new HttpException(StatusCodes.NOT_FOUND, `No post found with ID ${postId}`);
@@ -85,8 +86,13 @@ export class PostService {
     }
 
     async getSuggestions(userId: NonStrictObjectId) {
-        let suggestions: IPost[] = [];
-        const suggestionsIds: IAlgoSuggestionOther[] = (await AlgoSuggestion.findOne({ user: userId }))!.others.slice(0, 200);
+
+        //find diversity and factChecking rate for the user
+        const userParams: IAlgoParams = (await this.userService.getUser(userId)).parameters;
+        console.log("USER PARAMETERS : " + userParams);
+
+        let suggestions: ItemForComputation[] = [];
+        const suggestionsIds: IAlgoSuggestionOther[] = (await AlgoSuggestion.findOne({ user: userId }))!.others;
 
         await Promise.all(
             suggestionsIds.map(async (so: IAlgoSuggestionOther) => {
@@ -94,40 +100,100 @@ export class PostService {
             }),
         );
 
+        //measure output relative to goal in terms of fact-checked posts
+        const goalFactChecked: number = (userParams.rateFactChecked)/100 * 200;
+        const outputFactChecked: number = suggestions.slice(0,200).filter( (sug) => sug.metrics.nbFactChecks > 0).length; //feed : 200 suggestions so compare only on this part of the output
+        const differenceOutputGoal: number = outputFactChecked - goalFactChecked;
+
+        console.log("Goal FC : " + goalFactChecked + ' / output FC : ' + outputFactChecked + ' / diff : ' + differenceOutputGoal);
+
+        const filterFunction = (post: ItemForComputation) => {
+                //too much fact-checks, we KEEP the un-fact-checked
+                //unsufficient number or fact-checks, we KEEP the fact-checked
+                return differenceOutputGoal > 0 ?
+                    (post.metrics.nbFactChecks == 0) :
+                    (post.metrics.nbFactChecks != 0)
+        }
+
+        const removeItems = (sugList: ItemForComputation[], diff: number) => {
+            let sortedSugList: ItemForComputation[] = sugList
+                .sort((post) => filterFunction(post) ? 1 : 0)
+                .filter((post) => filterFunction(post))
+                .slice(Math.abs(diff))
+
+            return sugList.filter((post) => !sortedSugList.includes(post))
+        }
+
+        if (differenceOutputGoal != 0) {
+            let remainingPostsToDelete = Math.abs(differenceOutputGoal);
+            //keep only correctly guessed remaining posts after position 200
+            let possibleSuggestions = suggestions
+                .slice(201)
+                .filter((post) => filterFunction(post));
+            //filter the current feed
+            let firstSuggestions = removeItems(suggestions.slice(0,200).reverse(), differenceOutputGoal) //IMPORTANT : reverse because order is important
+            
+            //update sugestions
+            suggestions = firstSuggestions.concat(possibleSuggestions.slice(0, differenceOutputGoal))
+        }
+
         const nbSuggestions = suggestions.length;
         if (nbSuggestions < 200) {
+
+            const nbFactChecked = suggestions.slice(0,200).filter( (sug) => sug.metrics.nbFactChecks > 0).length;
+            const diffFactCheckedPostsToAdd: number = goalFactChecked - nbFactChecked; //nb of fact-checked posts to add to the feed (only >= 0 at this point)
+
             //fills missing posts with random posts
             const nbSuggToAdd = 200 - nbSuggestions;
-            const pipeline = [
-                { $sample: { size: nbSuggToAdd } },
-                {
-                    $lookup: {
-                        from: 'users',
-                        localField: 'createdBy',
-                        foreignField: '_id',
-                        as: 'createdBy',
-                    },
-                },
-                {
-                    $project: {
-                        username: '$createdBy.username',
-                        _id: '$createdBy._id',
-                    },
-                },
-                {
-                    $lookup: {
+            const factCheckPipeline = [
+                { $lookup: {
                         from: 'metrics',
                         localField: '_id',
                         foreignField: 'postId',
                         as: 'metrics',
-                    },
-                },
-                { $limit: nbSuggToAdd },
-            ];
+                    }},
+                { $match: {
+                        'metrics.nbFactChecks': { $gt: 0 } //keep fact-checked posts
+                    }},
+                { $sample: { size: diffFactCheckedPostsToAdd } },
+                { $lookup: {
+                        from: 'users',
+                        localField: 'createdBy',
+                        foreignField: '_id',
+                        as: 'createdBy',
+                    }},
+                { $project: {
+                        username: '$createdBy.username',
+                        _id: '$createdBy._id',
+                    }},
+            ]
+            const notFactChekedPipeline = [
+                { $lookup: {
+                        from: 'metrics',
+                        localField: '_id',
+                        foreignField: 'postId',
+                        as: 'metrics',
+                    }},
+                { $match: {
+                        'metrics.nbFactChecks': { $lt: 0 } //keep un-fact-checked posts
+                    }},
+                { $sample: { size: nbSuggToAdd-diffFactCheckedPostsToAdd } },
+                { $lookup: {
+                        from: 'users',
+                        localField: 'createdBy',
+                        foreignField: '_id',
+                        as: 'createdBy',
+                    }},
+                { $project: {
+                        username: '$createdBy.username',
+                        _id: '$createdBy._id',
+                    }},
+            ]
 
-            const suggestionsToAdd = await Post.aggregate(pipeline);
+            const factCheckedSuggestionsToAdd = await Post.aggregate(factCheckPipeline);
+            const notFactCheckedSuggestionsToAdd = await Post.aggregate(notFactChekedPipeline);
 
-            suggestions = suggestions.concat(suggestionsToAdd);
+            suggestions = suggestions.concat(factCheckedSuggestionsToAdd).concat(notFactCheckedSuggestionsToAdd);
         }
 
         return {

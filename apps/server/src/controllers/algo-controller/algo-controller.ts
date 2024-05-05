@@ -47,7 +47,7 @@ export class AlgoController extends AbstractController {
 
                     const errors = await this.algoService.computeForUser(
                         req.params.userId,
-                        req.query.type as AlgoSuggestionType,
+                        req.body.type as AlgoSuggestionType,
                     );
 
                     if (errors.length) {

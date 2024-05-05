@@ -1,15 +1,12 @@
 import { IAlgoField, IAlgoFieldOther } from '../../models/algo/algo-field';
-import { AlgoSuggestionReconfComputer, AlgoSuggestionReconfConfig } from './algo-suggestions-reconf-computer';
-
-interface AlgoSuggestionRecoDiversConfig extends AlgoSuggestionReconfConfig {
-    diversityCoefficient: number; // 1=only top users, 0=only avg. users
-}
+import { AlgoSuggestionConfidenceConfig } from './algo-suggestion-conf-computer';
+import { AlgoSuggestionReconfComputer } from './algo-suggestions-reconf-computer';
 
 export class AlgoSuggestionsRecoDiversComputer<
-    Config extends AlgoSuggestionRecoDiversConfig = AlgoSuggestionRecoDiversConfig,
+    Config extends AlgoSuggestionConfidenceConfig = AlgoSuggestionConfidenceConfig,
 > extends AlgoSuggestionReconfComputer<Config> {
-    protected getTopUsers(userEntry: IAlgoField): IAlgoFieldOther[] {
-        const nTopUsers = Math.round(this.config.diversityCoefficient * this.config.kTopUsers);
+    protected async getTopUsers(userEntry: IAlgoField): Promise<IAlgoFieldOther[]> {
+        const nTopUsers = Math.round(this.config.rateDiversification * this.config.kTopUsers);
         const nAvgUsers = this.config.kTopUsers - nTopUsers;
 
         const sortedUsers = userEntry.others.sort((a, b) => b.score - a.score);

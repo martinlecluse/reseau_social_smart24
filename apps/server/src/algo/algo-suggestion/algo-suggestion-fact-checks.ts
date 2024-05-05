@@ -1,13 +1,18 @@
 import { IAlgoFieldOther } from '../../models/algo/algo-field';
 import { AlgoSuggestionDefaultComputer } from './algo-suggestions-default-computer';
-import { AlgoSuggestionConfig, ItemForComputation } from './algo-suggestions-computer';
 import { Types, Document } from 'mongoose';
-import { IPost } from '../../models/post';
-import { AlgoSuggestionConfidenceComputer, AlgoSuggestionConfidenceConfig } from './algo-suggestion-conf-computer';
+import { IMetrics, Metrics } from '../..//models/metrics';
+import { IPost, Post } from '../../models/post';
+import { ItemForComputation } from './algo-suggestions-computer';
+import { AlgoSuggestionConfidenceConfig } from './algo-suggestion-conf-computer';
 
-export class AlgoSuggestionReconfComputer<
-    Config extends AlgoSuggestionConfidenceConfig = AlgoSuggestionConfidenceConfig,
-> extends AlgoSuggestionConfidenceComputer<Config> {
+export interface AlgoSuggestionFactChecksConfig extends AlgoSuggestionConfidenceConfig {
+    factCheckCoefficient: number;
+}
+
+export class AlgoSuggestionFactChecksComputer<
+    Config extends AlgoSuggestionFactChecksConfig = AlgoSuggestionFactChecksConfig,
+> extends AlgoSuggestionDefaultComputer<Config> {
     protected computeWeightForItem(
         item: ItemForComputation,
         similarOther: IAlgoFieldOther | undefined,
@@ -17,6 +22,7 @@ export class AlgoSuggestionReconfComputer<
         let secondaryOther: IAlgoFieldOther | undefined;
         let primaryCoefficient: number;
         let secondaryCoefficient: number;
+        let factCheckCoefficient: number = this.config.factCheckCoefficient;
 
         if (this.config.selectUserType === 'confidence') {
             primaryOther = confidenceOther;
@@ -30,10 +36,19 @@ export class AlgoSuggestionReconfComputer<
             secondaryCoefficient = this.config.confidenceCoefficient;
         }
 
+        const nbFactChecks = item.metrics.nbFactChecks;
+        console.log("NB FACT-CHECKS : " + nbFactChecks)
+        let factCheckScore: number = 0; //no fact-chceks => no impact
+
+        if (nbFactChecks > 0) {
+            factCheckScore = item.metrics.factCheckScore - 1.5; //below mean => degradation
+            console.log("FACT-CHECK SCORE : " + factCheckScore)
+        }
+
         if (primaryOther) {
             if (secondaryOther) {
                 return (
-                    (primaryOther.score / primaryCoefficient + secondaryOther.score / secondaryCoefficient) /
+                    (primaryOther.score / primaryCoefficient + secondaryOther.score / secondaryCoefficient + factCheckScore / factCheckCoefficient) /
                     (primaryCoefficient + secondaryCoefficient)
                 );
             } else {
