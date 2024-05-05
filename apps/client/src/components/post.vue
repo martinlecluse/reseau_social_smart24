@@ -30,11 +30,6 @@ const trustedBy = ref(false);
 const untrustedBy = ref(false);
 
 const dateInstance = new Date(props.info.date);
-const year = dateInstance.getFullYear();
-const month = dateInstance.getMonth();
-const day = dateInstance.getDate();
-const hour = dateInstance.getHours();
-const minute = dateInstance.getMinutes();
 
 const showFactChecks = ref(false);
 const loadComments = ref(false);
@@ -133,69 +128,69 @@ function checkIfUserHasLiked(list) {
 
     <div class="  ">
         <div class="post">
-            <div class="post-header">
-                <!-- <h2 class="createdBy">{{props.info.createdBy.username}}</h2> -->
-                <h3 class="date">{{ day }}-{{ month }}-{{ year }} {{hour}}:{{minute}}</h3>  
-
-            </div>
             <div class="post-content">
                 <p class="std"> {{info.text}}</p>
             </div>
             <div class="post-footer">
                 <div class="post-footer-left"> 
-                    <div v-if="props.userIsFactChecker" class="comment-icon-container">          
-                        <button  class="material-symbols-outlined button-post" @click="factCheckPost">
-
-                            verified
-                        </button> 
-                        <div class="comment-count-bubble">{{metric.nbFactChecks}}</div>
-                    </div>
-                    <div class="comment-icon-container">
-                        <button v-if="trustedBy" class="material-symbols-outlined button-post green" @click="trustPost">
-                            verified_user
+                    <div v-if="props.userIsFactChecker" class="comment-icon-container">  
+                        <button class="post-btn" @click="factCheckPost">
+                            <span class="post-btn-icon material-symbols-outlined">verified</span>
+                            <span class="post-btn-count">{{metric.nbFactChecks}}</span>
                         </button>
-                        <button v-else class="material-symbols-outlined button-post " @click="trustPost">
-                            verified_user
-                        </button>
-                        <div class="comment-count-bubble">{{metric.nbTrusts}}</div>
-                    </div>
-                    <div class="comment-icon-container">
-                        <button v-if="untrustedBy" class="material-symbols-outlined button-post red" @click="untrustPost">
-                            remove_moderator
-                        </button> 
-                        <button v-else class="material-symbols-outlined button-post" @click="untrustPost">
-                            remove_moderator
-                        </button>  
-                        <div class="comment-count-bubble">{{metric.nbUntrusts}}</div>
-                    </div> 
-                    <div class="comment-icon-container">
-                        <button v-if="likedBy" class="material-symbols-outlined button-post green" @click="likePost">
-                            thumb_up
-                        </button>
-                        <button v-else class="material-symbols-outlined button-post" @click="likePost">
-                            thumb_up
-                        </button>
-                        <div class="comment-count-bubble">{{metric.nbLikes}}</div>
-                    </div>
-                      
-                    <div class="comment-icon-container">
-                        <button v-if="unlikedBy" class="material-symbols-outlined button-post red" @click="dislikePost">
-                            thumb_down
-                        </button>  
-                        <button v-else class="material-symbols-outlined button-post" @click="dislikePost">
-                            thumb_down
-                        </button> 
-                        <div class="comment-count-bubble">{{metric.nbDislikes}}</div>
                     </div>
 
-                    <div class="comment-icon-container">
-                        <button class="material-symbols-outlined button-post" @click="openCommentsPanel">
-                        comment
-                        </button>  
-                        <div class="comment-count-bubble">{{metric.nbComments}}</div>
+                    <div class="post-btn-grp">
+                        <button v-if="trustedBy" class="post-btn post-btn-active post-btn-green" @click="trustPost">
+                            <span class="post-btn-icon material-symbols-outlined">verified_user</span>
+                            <span class="post-btn-count">{{metric.nbTrusts}}</span>
+                        </button>
+                        <button v-else class="post-btn" @click="trustPost">
+                            <span class="post-btn-icon material-symbols-outlined">verified_user</span>
+                            <span class="post-btn-count">{{metric.nbTrusts}}</span>
+                        </button>
+
+                        <button v-if="untrustedBy" class="post-btn post-btn-active post-btn-red" @click="untrustPost">
+                            <span class="post-btn-icon material-symbols-outlined">remove_moderator</span>
+                            <span class="post-btn-count">{{metric.nbUntrusts}}</span>
+                        </button>
+                        <button v-else class="post-btn" @click="untrustPost">
+                            <span class="post-btn-icon material-symbols-outlined">remove_moderator</span>
+                            <span class="post-btn-count">{{metric.nbUntrusts}}</span>
+                        </button>
+                    </div>
+
+                    <div class="post-btn-grp">
+                        <button v-if="likedBy" class="post-btn post-btn-active post-btn-green" @click="likePost">
+                            <span class="post-btn-icon material-symbols-outlined">thumb_up</span>
+                            <span class="post-btn-count">{{metric.nbLikes}}</span>
+                        </button>
+                        <button v-else class="post-btn" @click="likePost">
+                            <span class="post-btn-icon material-symbols-outlined">thumb_up</span>
+                            <span class="post-btn-count">{{metric.nbLikes}}</span>
+                        </button>
+
+                        <button v-if="unlikedBy" class="post-btn post-btn-active post-btn-red" @click="dislikePost">
+                            <span class="post-btn-icon material-symbols-outlined">thumb_down</span>
+                            <span class="post-btn-count">{{metric.nbDislikes}}</span>
+                        </button>
+                        <button v-else class="post-btn" @click="dislikePost">
+                            <span class="post-btn-icon material-symbols-outlined">thumb_down</span>
+                            <span class="post-btn-count">{{metric.nbDislikes}}</span>
+                        </button>
+                    </div>
+
+                    <div class="post-btn-grp">
+                        <button class="post-btn" @click="openCommentsPanel">
+                            <span class="post-btn-icon material-symbols-outlined">comment</span>
+                            <span class="post-btn-count">{{metric.nbComments}}</span>
+                        </button>
                     </div>
                 </div>
-               
+                
+                <div class="post-footer-right">
+                    <p class="post-date">{{ dateInstance.toLocaleString('fr-FR') }}</p>
+                </div>
             </div>
         </div>
     </div>
@@ -208,84 +203,95 @@ function checkIfUserHasLiked(list) {
 </template>
 
 <style scoped>
-.comment-icon-container {
-    position: relative;
-    display: inline-block;
-}
 
-.comment-count-bubble {
-    position: absolute;
-    transform: translate(50%, -50%);
-    top: 0.6vh;
-    left: 1.8vh;
-    background-color: #B9ABAB;
-    color: white;
-    border-radius: 50%;
-    width: 1.5vh;
-    height: 1.5vh;
-    font-size: 1.3vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-p {
-    font-family: 'inter', sans-serif;
-    font-weight: normal;
-    font-size: 1.5vh;
+h1, h2, h3, h4, h5, h6, p {
     margin: 0;
 }
 
-.container{
-    height:20vh;
-}
-
-
-.post-header{
+.post {
+    font-family: 'inter', sans-serif;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.post-footer {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-
 }
 
-.createdBy{
-    font-family: 'inter', sans-serif;
-    font-weight: bold;
-    font-size: 1.8vh;
-    margin-right: 2vh;
+.post-footer-left {
+    display: flex;
+    gap: 6px;
 }
 
-.date{
-    font-family: 'inter', sans-serif;
-    font-weight:normal;
-    font-size: 1.8vh;
-    margin-right: 2vh;
-}
-
-.green{
-    color: #08a808;
-}
-
-.red{
-    color: #d20505;
-}
-
-.post-footer{
-    display:flex;
-}
-
-.button-post{
-    background-color: transparent;
-    margin-right: 2vh;
+.post-btn {
+    display: flex;
+    align-items: center;
+    appearance: none;
     border: none;
+    background: none;
+    padding: 4px 12px;
+    gap: 6px;
+    border: solid 1px rgb(202, 202, 202);
+    border-radius: 100px;
     outline: none;
+    color: rgba(0, 0, 0, 0.8);
 }
 
-.button-post:hover{
-    color:#B9ABAB;
+.post-btn:hover {
+    background-color: rgb(236, 236, 236);
 }
 
-.button-post:focus{
-    outline: none;
+.post-btn-green {
+    color: rgb(49, 154, 96);
+    background-color: rgb(236, 255, 245);
 }
+
+.post-btn-green:hover {
+    background-color: rgb(211, 238, 224);
+}
+
+.post-btn-red {
+    color: rgb(242, 81, 53);
+    background-color: rgb(255, 244, 242);
+}
+
+.post-btn-red:hover {
+    background-color: rgb(240, 224, 221);
+}
+
+.post-btn-icon {
+    font-size: 1.2rem;
+}
+
+.post-btn-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0.75;
+    width: 1em;
+}
+
+.post-btn-grp {
+    display: flex;
+}
+
+.post-btn-grp .post-btn:not(:first-child) {
+    border-left: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.post-btn-grp .post-btn:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.post-date {
+    margin: 0;
+    font-size: 0.9em;
+    opacity: 0.75;
+}
+
 </style>
