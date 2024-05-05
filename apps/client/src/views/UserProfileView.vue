@@ -7,8 +7,6 @@ import { useUserInfoStore } from "../stores/userInfo";
 import { computed, onMounted, ref, defineProps } from "vue";
 import axios from 'axios'
 
-//Route /profile/663243a7a3df229850bf97c5
-
 const props = defineProps({
   profileId: {
     type: String,
@@ -20,9 +18,6 @@ const store = useUserInfoStore();
 
 let currentUserId = ref('');
 let currentUserUsername = ref('');
-let currentUserName = ref('');
-let currentUserSurname = ref('');
-
 
 let userProfileId: string = props.profileId;
 let userProfileUsername = ref('');
@@ -51,8 +46,6 @@ onMounted( () => {
     const userInfo = computed(()=>store.getUserInfo).value;
     currentUserId.value = userInfo._id!;
     currentUserUsername.value = userInfo.username!;
-    currentUserName.value = userInfo.name!;
-    currentUserSurname.value = userInfo.surname!;
     fetchInfos(userProfileId);
 });
 
@@ -96,7 +89,7 @@ async function unTrustUser(){
 
 <template>
   <div class="content">
-    <bandeau :username="currentUserUsername" :firstname="currentUserName" :lastname="currentUserSurname" />
+    <bandeau :username="currentUserUsername"/>
     <div class="user-profile-container">
       <div class="user-profile-infos">
         <strong>
@@ -171,5 +164,52 @@ async function unTrustUser(){
   .factCheckerTick {
     font-size: 15px;
     margin-left: 5px;
+  }
+  
+  .factCheckerTick:hover:after {
+    display: block;
+    content: "This user is a fact checker";
+    position: absolute;
+    background: #f8f8f8;
+    border-right: 5px solid #dfdfdf;
+    border-bottom: 5px solid #dfdfdf;
+    border-top: 5px solid #dfdfdf;
+    border-left: 5px solid #dfdfdf;
+    padding: 5px;
+    width: auto;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .trust:hover:after {
+    color: black;
+    display: block;
+    content: "Trust user";
+    position: absolute;
+    background: #f8f8f8;
+    border-right: 5px solid #dfdfdf;
+    border-bottom: 5px solid #dfdfdf;
+    border-top: 5px solid #dfdfdf;
+    border-left: 5px solid #dfdfdf;
+    padding: 5px;
+    width: auto;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .untrust:hover:after {
+    color: black;
+    display: block;
+    content: "Untrust user";
+    position: absolute;
+    background: #f8f8f8;
+    border-right: 5px solid #dfdfdf;
+    border-bottom: 5px solid #dfdfdf;
+    border-top: 5px solid #dfdfdf;
+    border-left: 5px solid #dfdfdf;
+    padding: 5px;
+    width: auto;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
   }
 </style>
