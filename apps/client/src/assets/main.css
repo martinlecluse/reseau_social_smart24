@@ -63,3 +63,7 @@ textarea{
   padding: 1rem;
   border:none;
 }
+
+.right-box{
+  display: flex;
+}
