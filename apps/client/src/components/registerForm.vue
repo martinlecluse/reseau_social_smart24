@@ -12,31 +12,38 @@ const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 
-async function register(){
-  if (
-    !name.value ||
-    !surname.value ||
-    !username.value ||
-    !email.value ||
-    !password.value ||
-    !confirmPassword.value
-  ) {
-    alert('Please fill in all fields')
-    return
-  }
+ async function register(){
+     if (
+         !name.value ||
+         !surname.value ||
+         !username.value ||
+         !email.value ||
+         !password.value ||
+         !confirmPassword.value
+     ) {
+         alert('Please fill in all fields')
+         return
+     }
 
-  if (password.value !== confirmPassword.value) {
-    alert('Passwords do not match')
-    return
-  }
+     if (password.value !== confirmPassword.value) {
+         alert('Passwords do not match')
+         return
+     }
 
-  if (password.value.length < 5){
-    alert("Password's length must be at least 5")
-  }
+     if (password.value.length < 5){
+         alert("Password's length must be at least 5");
+         return;
+     }
 
-  await tokenstore.register({name: name.value, surname: surname.value, username: username.value, mail: email.value, password: password.value})
-  window.location.href = '/login'
-}
+     const res = await tokenstore.register({name: name.value, surname: surname.value, username: username.value, mail: email.value, password: password.value})
+
+     if (res.data.message) {
+         alert(res.data.message);
+     }
+     else {
+         window.location.href = '/login';
+     }
+ }
 </script>
 
 <template>
