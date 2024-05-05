@@ -12,7 +12,7 @@ const props = defineProps({
 
 <template>
     <div class="feed">
-        <div class="posts" v-for="(item,index) in  props.posts[0]" key="index">
+        <div class="posts" v-for="item in  props.posts" key="index">
             <post :info="item"></post>
         </div>
     </div>

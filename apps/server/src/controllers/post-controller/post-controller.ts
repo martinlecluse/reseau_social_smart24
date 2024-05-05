@@ -8,10 +8,14 @@ import { singleton } from 'tsyringe';
 import { AuthRequest, auth } from '../../middleware/auth';
 import { HttpException } from '../../models/http-exception';
 import { ICreateComment } from '../../models/comment';
+import { FactCheckService } from '../../services/factCheck-service/factCheck-service';
 
 @singleton()
 export class PostController extends AbstractController {
-    constructor(private readonly postService: PostService) {
+    constructor(
+        private readonly postService: PostService,
+        private readonly factCheckService: FactCheckService,
+    ) {
         super({ basePath: '/posts' });
     }
 
@@ -62,6 +66,18 @@ export class PostController extends AbstractController {
             async (req: AuthRequest<{ id: string }>, res: Response, next: NextFunction) => {
                 try {
                     res.status(StatusCodes.OK).send(await this.postService.getPostComments(req.params.id));
+                } catch (error) {
+                    next(error);
+                }
+            },
+        );
+
+        router.get(
+            '/:id/factChecks',
+            auth,
+            async (req: AuthRequest<{ id: string }>, res: Response, next: NextFunction) => {
+                try {
+                    res.status(StatusCodes.OK).send(await this.factCheckService.getFactChecksByPost(req.params.id));
                 } catch (error) {
                     next(error);
                 }
