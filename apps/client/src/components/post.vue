@@ -238,6 +238,7 @@ h1, h2, h3, h4, h5, h6, p {
     border-radius: 100px;
     outline: none;
     color: rgba(0, 0, 0, 0.8);
+    transition: ease-in background-color 0.1s;
 }
 
 .post-btn:hover {
@@ -264,6 +265,15 @@ h1, h2, h3, h4, h5, h6, p {
 
 .post-btn-icon {
     font-size: 1.2rem;
+    transition: ease-in scale 0.1s;
+}
+
+.post-btn:hover .post-btn-icon {
+    scale: 1.075;
+}
+
+.post-btn:active .post-btn-icon {
+    scale: 0.925;
 }
 
 .post-btn-count {
