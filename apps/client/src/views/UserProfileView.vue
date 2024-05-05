@@ -34,19 +34,19 @@ const fetchInfos = async (userId: string) => {
     userProfileName.value = JSON.stringify(response.data.userData.name).replace(/"/g, '');
     userProfileSurname.value = JSON.stringify(response.data.userData.surname).replace(/"/g, '');
     userProfileFactchecker.value = (JSON.stringify(response.data.userData.factChecker) == "true")
-    posts.value.push(response.data);
+    posts.value = (JSON.parse(JSON.stringify(response.data.lastPosts)));
   } catch (error) {
     console.error(error);
   }
-  console.log(posts);
+  console.log((posts));
 };
 
-onMounted( () => {
+onMounted( async () => {
     //retrieve session information
     const userInfo = computed(()=>store.getUserInfo).value;
     currentUserId.value = userInfo._id!;
     currentUserUsername.value = userInfo.username!;
-    fetchInfos(userProfileId);
+    await fetchInfos(userProfileId);
 });
 
 async function buttonTrustUser() {
@@ -111,7 +111,7 @@ async function unTrustUser(){
         </button>
       </div>
     </div>
-    <feed :posts="posts" class="posts"></feed>
+    <feed :posts="posts" :isFactChecker="userProfileFactchecker" class="posts"></feed>
   </div>
 </template>
 

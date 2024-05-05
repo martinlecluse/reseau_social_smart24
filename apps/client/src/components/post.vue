@@ -134,7 +134,7 @@ function checkIfUserHasLiked(list) {
     <div class="  ">
         <div class="post">
             <div class="post-header">
-                <h2 class="createdBy">{{props.info.createdBy.username}}</h2>
+                <!-- <h2 class="createdBy">{{props.info.createdBy.username}}</h2> -->
                 <h3 class="date">{{ day }}-{{ month }}-{{ year }} {{hour}}:{{minute}}</h3>  
 
             </div>

@@ -1,10 +1,11 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <!-- eslint-disable vue/require-v-for-key -->
-<script setup>
+<script setup lang="ts">
+import { onMounted, defineProps } from 'vue';
 import post from '../post.vue'
 
 const props = defineProps({
-    posts: Array,
+    posts: Object,
     isFactChecker: Boolean
 })
 
