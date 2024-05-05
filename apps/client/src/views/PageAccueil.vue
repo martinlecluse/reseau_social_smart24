@@ -7,11 +7,9 @@ import { onMounted, ref } from "vue";
 import AppHeader from "@/components/common/AppHeader.vue";
 import modal from "@/components/pop-ups/modal.vue";
 import NewPost from "@/components/NewPost.vue";
-import { useTokenStore } from '@/stores/auth';
 
 const loadFeed = ref(false);
 
-const tokenStore = useTokenStore();
 const store = useUserInfoStore();
 
 const userId = ref('')
@@ -32,10 +30,6 @@ const handleNewPostStatus = (status: string) => {
     }
 }
 
-const logout = () => {
-    tokenStore.logout();
-    window.location.href = '/login';
-}
 
 onMounted(async () => {
     let userInfo = store.getUserInfo;
@@ -56,14 +50,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <AppHeader>
-        <template v-slot:nav>
-            <router-link to="/settings">
-                <button class="btn btn-primary b">Settings</button>
-            </router-link>
-            <button class="btn btn-primary b" @click="logout">Logout</button>
-        </template>
-    </AppHeader>
+    <AppHeader></AppHeader>
 
     <div class="mainFeed">
         <main>

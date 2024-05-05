@@ -1,8 +1,15 @@
 <script setup>
 import AppLogo from '../logo/app-logo.vue';
 import { useUserInfoStore } from "../../stores/userInfo";
+import { useTokenStore } from '@/stores/auth';
 
+const tokenStore = useTokenStore();
 const userInfoStore = useUserInfoStore();
+
+const logout = () => {
+    tokenStore.logout();
+    window.location.href = '/login';
+}
 
 </script>
 
@@ -17,7 +24,15 @@ const userInfoStore = useUserInfoStore();
         </div>
 
         <nav>
-            <slot name="nav"></slot>
+            <slot name="nav">
+                <router-link to="/homepage">
+                    <button class="btn btn-primary b">Feed</button>
+                </router-link>
+                <router-link to="/settings">
+                    <button class="btn btn-primary b">Settings</button>
+                </router-link>
+                <button class="btn btn-primary b" @click="logout">Logout</button>
+            </slot>
         </nav>
     </header>
 </template>
