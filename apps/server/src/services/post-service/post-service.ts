@@ -7,6 +7,7 @@ import { Metrics } from '../../models/metrics';
 import { ICreatePost, IPost, Post } from '../../models/post';
 import { NonStrictObjectId } from '../../utils/objectid';
 import { UserService } from '../user-service';
+import { AlgoSuggestion, IAlgoSuggestionOther } from '../../models/algo/algo-suggestion';
 
 @singleton()
 export class PostService {
@@ -53,7 +54,7 @@ export class PostService {
     }
 
     async getPost(postId: NonStrictObjectId): Promise<Document & IPost> {
-        const post = await Post.findOne({ _id: postId });
+        const post = await Post.findOne({ _id: postId }).populate('createdBy', 'username _id').populate('metrics');
 
         if (!post) {
             throw new HttpException(StatusCodes.NOT_FOUND, `No post found with ID ${postId}`);
@@ -79,7 +80,58 @@ export class PostService {
         return res;
     }
 
-    async getMetricsId(postId: NonStrictObjectId): Promise<string> {
-        return (await this.getPost(postId)).metrics.toString();
+    async getMetricsId(postId: NonStrictObjectId): Promise<NonStrictObjectId> {
+        return (await this.getPost(postId)).metrics;
+    }
+
+    async getSuggestions(userId: NonStrictObjectId) {
+        let suggestions: IPost[] = [];
+        const suggestionsIds: IAlgoSuggestionOther[] = (await AlgoSuggestion.findOne({ user: userId }))!.others.slice(0, 200);
+
+        await Promise.all(
+            suggestionsIds.map(async (so: IAlgoSuggestionOther) => {
+                suggestions.push(await this.getPost(so.item));
+            }),
+        );
+
+        const nbSuggestions = suggestions.length;
+        if (nbSuggestions < 200) {
+            //fills missing posts with random posts
+            const nbSuggToAdd = 200 - nbSuggestions;
+            const pipeline = [
+                { $sample: { size: nbSuggToAdd } },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'createdBy',
+                        foreignField: '_id',
+                        as: 'createdBy',
+                    },
+                },
+                {
+                    $project: {
+                        username: '$createdBy.username',
+                        _id: '$createdBy._id',
+                    },
+                },
+                {
+                    $lookup: {
+                        from: 'metrics',
+                        localField: '_id',
+                        foreignField: 'postId',
+                        as: 'metrics',
+                    },
+                },
+                { $limit: nbSuggToAdd },
+            ];
+
+            const suggestionsToAdd = await Post.aggregate(pipeline);
+
+            suggestions = suggestions.concat(suggestionsToAdd);
+        }
+
+        return {
+            suggestions: suggestions,
+        };
     }
 }

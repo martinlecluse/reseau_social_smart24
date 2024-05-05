@@ -12,6 +12,7 @@ const username = ref('');
  const error = ref('');
 
 async function login() {
+
      const res = await tokenStore.login({username : username.value, password : password.value});
 
      if (res.data.user) {

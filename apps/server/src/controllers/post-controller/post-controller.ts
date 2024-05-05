@@ -9,6 +9,8 @@ import { AuthRequest, auth } from '../../middleware/auth';
 import { HttpException } from '../../models/http-exception';
 import { ICreateComment } from '../../models/comment';
 import { FactCheckService } from '../../services/factCheck-service/factCheck-service';
+import { IUser } from 'src/models/user';
+
 
 @singleton()
 export class PostController extends AbstractController {
@@ -38,6 +40,19 @@ export class PostController extends AbstractController {
                 }
             },
         );
+
+        router.get(
+            '/getSuggestions',
+            auth,
+            async (req: AuthRequest<object, IUser>, res: Response, next: NextFunction) => {
+                try {
+                    res.status(StatusCodes.OK).send(await this.postService.getSuggestions(req.user?._id));
+                } catch (e) {
+                    next(e);
+                }
+            },
+        );
+
         router.post(
             '/comment',
             auth,
