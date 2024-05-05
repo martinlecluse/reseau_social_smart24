@@ -47,16 +47,19 @@ async function updateUserParams() {
 
 onMounted(async () => {
     //recover user id
+    console.log("before axios" + userData.value)
     const userInfo = userInfoStore.getUserInfo;
     userId.value = userInfo._id;
     token.value = computed(() => tokenStore.getToken).value;
 
     //get all info
     userData.value = (await axios.get('/user/' + userId.value)).data;
+    console.log("after axios" + userData.value);
     //important not to crush values saved in the db in case user clicks on "valider"
     newFactCheckedRate.value = userData.value.parameters.rateFactChecked;
     newDiversityRate.value = userData.value.parameters.rateDiversification;
     loaded.value = true;
+    console.log("loaded" + loaded.value);
 });
 
 </script>
