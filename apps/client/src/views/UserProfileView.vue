@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import bandeau from "../components/common/bandeau-settings.vue"
+import AppHeader from "@/components/common/AppHeader.vue";
 import feed from "../components/common/feed.vue"
 import '../assets/main.css'
 import { useUserInfoStore } from "../stores/userInfo";
@@ -88,8 +88,9 @@ async function unTrustUser(){
 </style>
 
 <template>
+  <AppHeader></AppHeader>
+  
   <div class="content">
-    <bandeau :username="currentUserUsername"/>
     <div class="user-profile-container">
       <div class="user-profile-infos">
         <strong>
