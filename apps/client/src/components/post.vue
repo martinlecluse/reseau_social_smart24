@@ -5,7 +5,6 @@ import { useUserInfoStore } from "../stores/userInfo";
 import FeedComment from "./FeedComment.vue";
 import modal from "./pop-ups/modal.vue";
 import FeedFactCheck from "./FeedFactCheck.vue";
-import FeedComment from "./FeedComment.vue"
 
 const props = defineProps({
     info: {
@@ -19,14 +18,10 @@ const props = defineProps({
     userIsFactChecker: Boolean
 });
 
-const loadComments = ref(false)
 
 const store = useUserInfoStore();
 const userInfo = store.getUserInfo;
 const id = userInfo._id;
-
-//RESULTAT de merge à vérifier si encore utile
-const userIsFactChecker = userInfo.isFactChecker === "true" ? true : false;
 
 const metric = ref('');
 const likedBy = ref(false);
