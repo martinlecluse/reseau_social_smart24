@@ -80,8 +80,8 @@ export class PostService {
         return res;
     }
 
-    async getMetricsId(postId: NonStrictObjectId): Promise<string> {
-        return (await this.getPost(postId)).metrics.toString();
+    async getMetricsId(postId: NonStrictObjectId): Promise<NonStrictObjectId> {
+        return (await this.getPost(postId)).metrics;
     }
 
     async getSuggestions(userId: NonStrictObjectId) {
