@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import { container, singleton } from 'tsyringe';
 import { HttpException } from './models/http-exception';
 import { errorHandler } from './middleware/error-handler';
 import { DatabaseService } from './services/database-service/database-service';
@@ -10,8 +9,7 @@ import { MetricsController } from './controllers/metrics-controller/metrics-cont
 import { FactCheckerController } from './controllers/factCheck-controller/factCheck-controller';
 import { AuthController } from './controllers/auth-controller/auth-controller';
 import { AlgoController } from './controllers/algo-controller/algo-controller';
-import { UserService } from './services/user-service';
-import { PostService } from './services/post-service/post-service';
+import { singleton } from 'tsyringe';
 
 @singleton()
 export class Application {

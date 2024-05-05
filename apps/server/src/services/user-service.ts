@@ -1,19 +1,14 @@
-import bcryptjs from 'bcryptjs';
 import User, { IUser, IUserCreation } from '../models/user';
-import { Post, IPost } from '../models/post';
+import { Post } from '../models/post';
 import { singleton } from 'tsyringe';
 import { StatusCodes } from 'http-status-codes';
-import jwt from 'jsonwebtoken';
 import { Document, Types, UpdateQuery } from 'mongoose';
 import { HttpException } from '../models/http-exception';
 import { NonStrictObjectId, toObjectId } from '../utils/objectid';
-import { env } from '../utils/env';
 
 @singleton()
 export class UserService {
-
-    constructor () {
-    }
+    constructor() {}
 
     async getUser(userId: NonStrictObjectId): Promise<IUser> {
         const user = await User.findById(userId);

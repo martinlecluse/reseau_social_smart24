@@ -18,7 +18,7 @@ export class AuthService {
         if (!foundUser) {
             throw new Error('UserName of user is not correct');
         }
-        
+
         const isMatch = bcryptjs.compareSync(password, foundUser.passwordHash);
 
         if (isMatch) {
@@ -49,7 +49,7 @@ export class AuthService {
             user: {
                 _id: createdUser._id.toString(),
                 username: createdUser.username,
-                factChecker: createdUser.factChecker
+                factChecker: createdUser.factChecker,
             },
             token: this.createSessionToken(createdUser),
         };

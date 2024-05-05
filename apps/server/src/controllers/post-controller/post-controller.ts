@@ -36,15 +36,17 @@ export class PostController extends AbstractController {
             },
         );
 
-        router.get('/getSuggestions',
+        router.get(
+            '/getSuggestions',
             auth,
             async (req: AuthRequest<object, IUser>, res: Response, next: NextFunction) => {
-            try {
-                res.status(StatusCodes.OK).send(await this.postService.getSuggestions(req.user?._id));
-            } catch (e) {
-                next(e);
-            }
-        });
+                try {
+                    res.status(StatusCodes.OK).send(await this.postService.getSuggestions(req.user?._id));
+                } catch (e) {
+                    next(e);
+                }
+            },
+        );
 
         router.post(
             '/comment',
