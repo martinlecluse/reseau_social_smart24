@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useTokenStore } from './stores/auth';
 import noise from '@/assets/noise.svg';
-import bg from '@/assets/background.jpeg'
 
 const tokenStore = useTokenStore();
 
@@ -23,8 +22,7 @@ if(tokenStore.getToken){
   <body>
     <RouterView />
 
-    <!-- <div class="background" :style="{'background': 'linear-gradient(rgb(240 240 240 / 72%), rgb(240 240 240 / 32%)), url(' + noise + ')'}"></div> -->
-    <div class="background" :style="{'background-image': `url(${bg})`}"></div>
+    <div class="background" :style="{'background': 'linear-gradient(rgb(240 240 240 / 72%), rgb(240 240 240 / 32%)), url(' + noise + ')'}"></div>
   </body>
 </template>
 
