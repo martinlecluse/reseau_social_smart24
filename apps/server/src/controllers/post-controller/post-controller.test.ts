@@ -1,5 +1,5 @@
 import request from 'supertest';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { container } from 'tsyringe';
 import { Application } from '../../app';
 import { StatusCodes } from 'http-status-codes';
@@ -8,6 +8,7 @@ import User, { IUser } from '../../models/user';
 import { Document } from 'mongoose';
 import { DateTime } from 'luxon';
 import { AuthService } from '../../services/auth-service/auth-service';
+import { Metrics } from '../../models/metrics'
 
 const DEFAULT_CREATE_POST: ICreatePost = {
     text: 'This is my post!',
@@ -16,6 +17,7 @@ const DEFAULT_CREATE_POST: ICreatePost = {
 const DEFAULT_POST = {
     text: 'This is my post!!!',
     date: DateTime.now(),
+    metrics: new Types.ObjectId('123123123123123123123123'),
 };
 
 describe('PostController', () => {
@@ -99,6 +101,9 @@ describe('PostController', () => {
 
     describe('POST /post/comment', () => {
         it('should create comment', async () => {
+            const metrics = new Metrics({});
+	await metrics.save();
+            DEFAULT_POST.metrics = metrics._id;
             const post = new Post(DEFAULT_POST);
             await post.save();
             return request(app['app'])

@@ -61,7 +61,7 @@ body {
     display: flex;
     align-items: center;
     width: 75%;
-    margin-bottom: 7%;
+    margin-bottom: 1%;
 }
 
 .line {
@@ -88,6 +88,7 @@ body {
     color: #fff;
     border: none;
     border-radius: 5px;
+    margin-top: 7%;
     margin-bottom: 7%;
     font-family: 'inter', sans-serif;
     font-weight: bold;
@@ -105,6 +106,5 @@ body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    background-image: linear-gradient(to bottom, #f7e1e1 50%, #B9ABAB 100%);
   }
   

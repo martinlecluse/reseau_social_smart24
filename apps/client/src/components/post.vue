@@ -58,8 +58,9 @@ const openCommentsPanel = () => {
     loadComments.value = true
 }
 
-const closeFeedComment = () => {
+const closeFeedComment = async () => {
     loadComments.value = false;
+    metric.value = await getMetrics();
 }
 
 async function getMetrics() {
@@ -260,7 +261,7 @@ function modifDiagram(){
                 
                 <div class="post-footer-right">
                     <p class="post-creator-username">
-                        <router-link v-if="props.info.createdBy && props.info.createdBy._id" :to="{ name: 'profile', params: { profileId: props.info.createdBy._id } }">
+                        <router-link v-if="props.info.createdBy && props.info.createdBy.username && props.info.createdBy._id" :to="{ name: 'profile', params: { profileId: props.info.createdBy._id } }">
                             {{ props.info.createdBy.username }}
                         </router-link>
                     </p>
@@ -337,78 +338,6 @@ h1, h2, h3, h4, h5, h6, p {
 .post-footer-left {
     display: flex;
     gap: 6px;
-}
-
-.post-btn {
-    display: flex;
-    align-items: center;
-    appearance: none;
-    border: none;
-    background: none;
-    padding: 4px 12px;
-    gap: 6px;
-    border: solid 1px rgb(202, 202, 202);
-    border-radius: 100px;
-    outline: none;
-    color: rgba(0, 0, 0, 0.8);
-    transition: ease-in background-color 0.1s;
-}
-
-.post-btn:hover {
-    background-color: rgb(236, 236, 236);
-}
-
-.post-btn-green {
-    color: rgb(49, 154, 96);
-    background-color: rgb(236, 255, 245);
-}
-
-.post-btn-green:hover {
-    background-color: rgb(211, 238, 224);
-}
-
-.post-btn-red {
-    color: rgb(242, 81, 53);
-    background-color: rgb(255, 244, 242);
-}
-
-.post-btn-red:hover {
-    background-color: rgb(240, 224, 221);
-}
-
-.post-btn-icon {
-    font-size: 1.2rem;
-    transition: ease-in scale 0.1s;
-}
-
-.post-btn:hover .post-btn-icon {
-    scale: 1.075;
-}
-
-.post-btn:active .post-btn-icon {
-    scale: 0.925;
-}
-
-.post-btn-count {
-    font-size: 0.75rem;
-    font-weight: 600;
-    opacity: 0.75;
-    width: 1em;
-}
-
-.post-btn-grp {
-    display: flex;
-}
-
-.post-btn-grp .post-btn:not(:first-child) {
-    border-left: none;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-.post-btn-grp .post-btn:not(:last-child) {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
 }
 
 .post-date {

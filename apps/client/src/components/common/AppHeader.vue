@@ -28,12 +28,12 @@ const logout = () => {
         <nav>
             <slot name="nav">
                 <router-link to="/homepage">
-                    <button class="btn btn-primary b">Feed</button>
+                    <button class="button">Feed</button>
                 </router-link>
                 <router-link to="/settings">
-                    <button class="btn btn-primary b">Settings</button>
+                    <button class="button">Settings</button>
                 </router-link>
-                <button class="btn btn-primary b" @click="logout">Logout</button>
+                <button class="button" @click="logout">Logout</button>
             </slot>
         </nav>
     </header>
@@ -51,7 +51,8 @@ header {
     width: 100%;
     padding: 0 24px;
     z-index: 100;
-    border-bottom: solid 1px rgb(231, 231, 231);
+    border-bottom: solid 1px rgb(240, 240, 240);
+    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.025);
 }
 
 .identity {

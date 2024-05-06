@@ -41,7 +41,6 @@ function redirectToRegister() {
             <input type="username" class="input-field" placeholder="Username" v-model="username">
             <input type="password" class="input-field" placeholder="Password" v-model="password">
             <button type="submit" class="login-button">Login</button>
-            <a class="forgot-password" href="">Forgot password ?</a>
             <div class="line-container">
                 <div class="line"></div>
                 <div class="or">OR</div>

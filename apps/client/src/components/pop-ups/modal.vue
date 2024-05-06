@@ -43,6 +43,9 @@
 .modal-content-passed {
   width: 98%;
   margin: 2em 0 0 2%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .modal-button{

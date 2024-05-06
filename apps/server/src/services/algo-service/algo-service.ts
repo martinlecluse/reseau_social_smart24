@@ -15,6 +15,9 @@ import { AlgoSuggestionType, AlgoSuggestionsDict } from '../../algo/algo-suggest
 import { AlgoSuggestionDefaultComputer } from '../../algo/algo-suggestion/algo-suggestions-default-computer';
 import { AlgoSuggestionReconfComputer } from '../../algo/algo-suggestion/algo-suggestions-reconf-computer';
 import { AlgoSuggestionsRecoDiversComputer } from '../../algo/algo-suggestion/algo-suggestions-reco-divers-computer';
+import { PostService } from '../post-service/post-service';
+import { AlgoSuggestionFactChecksComputer } from '../../algo/algo-suggestion/algo-suggestion-fact-checks';
+import { UserService } from '../user-service';
 
 @singleton()
 export class AlgoService {
@@ -22,41 +25,86 @@ export class AlgoService {
     private confidenceComputer: AlgoFieldComputer;
     private suggestionsComputers: AlgoSuggestionsDict;
 
-    constructor() {
+    constructor(
+        private readonly postService: PostService,
+        private readonly userService: UserService,
+    ) {
         this.similarityComputer = new AlgoFieldComputer(AlgoSimilar, RatingsLikes, RatingsDislikes);
         this.confidenceComputer = new AlgoFieldComputer(AlgoConfidence, RatingsTrust, RatingsUntrust);
         this.suggestionsComputers = {
-            default: new AlgoSuggestionDefaultComputer({
-                kTopUsers: 10,
-                positiveRatingsModel: RatingsLikes,
-                negativeRatingsModel: RatingsDislikes,
-                selectUserType: 'similar',
-            }),
-            reconf1: new AlgoSuggestionReconfComputer({
-                kTopUsers: 10,
-                similarityCoefficient: 1,
-                confidenceCoefficient: 1,
-                positiveRatingsModel: RatingsLikes,
-                negativeRatingsModel: RatingsDislikes,
-                selectUserType: 'similar',
-            }),
-            reconf2: new AlgoSuggestionReconfComputer({
-                kTopUsers: 10,
-                similarityCoefficient: 1,
-                confidenceCoefficient: 1,
-                positiveRatingsModel: RatingsTrust,
-                negativeRatingsModel: RatingsUntrust,
-                selectUserType: 'confidence',
-            }),
-            'reco-divers': new AlgoSuggestionsRecoDiversComputer({
-                kTopUsers: 10,
-                similarityCoefficient: 1,
-                confidenceCoefficient: 1,
-                positiveRatingsModel: RatingsLikes,
-                negativeRatingsModel: RatingsDislikes,
-                selectUserType: 'similar',
-                diversityCoefficient: 0.8,
-            }),
+            default: new AlgoSuggestionDefaultComputer(
+                {
+                    kTopUsers: 10,
+                    positiveRatingsModel: RatingsLikes,
+                    negativeRatingsModel: RatingsDislikes,
+                    selectUserType: 'similar',
+                    rateFactChecked: 1,
+                    rateDiversification: 0.8,
+                },
+                this.postService,
+                this.userService,
+            ),
+            reconf1: new AlgoSuggestionReconfComputer(
+                {
+                    kTopUsers: 10,
+                    similarityCoefficient: 1,
+                    confidenceCoefficient: 1,
+                    offsetTrustedUsers: 0.5,
+                    positiveRatingsModel: RatingsLikes,
+                    negativeRatingsModel: RatingsDislikes,
+                    selectUserType: 'similar',
+                    rateFactChecked: 1,
+                    rateDiversification: 0.8,
+                },
+                this.postService,
+                this.userService,
+            ),
+            reconf2: new AlgoSuggestionReconfComputer(
+                {
+                    kTopUsers: 10,
+                    similarityCoefficient: 1,
+                    confidenceCoefficient: 1,
+                    offsetTrustedUsers: 0.5,
+                    positiveRatingsModel: RatingsTrust,
+                    negativeRatingsModel: RatingsUntrust,
+                    selectUserType: 'confidence',
+                    rateFactChecked: 1,
+                    rateDiversification: 0.8,
+                },
+                this.postService,
+                this.userService,
+            ),
+            'reco-divers': new AlgoSuggestionsRecoDiversComputer(
+                {
+                    kTopUsers: 10,
+                    similarityCoefficient: 1,
+                    confidenceCoefficient: 1,
+                    offsetTrustedUsers: 0.5,
+                    positiveRatingsModel: RatingsLikes,
+                    negativeRatingsModel: RatingsDislikes,
+                    selectUserType: 'similar',
+                    rateFactChecked: 1,
+                    rateDiversification: 0.8,
+                },
+                this.postService,
+                this.userService,
+            ),
+            'reco-fact-check': new AlgoSuggestionFactChecksComputer(
+                {
+                    kTopUsers: 10,
+                    similarityCoefficient: 1,
+                    confidenceCoefficient: 1,
+                    offsetTrustedUsers: 0.5,
+                    factCheckCoefficient: 1,
+                    positiveRatingsModel: RatingsLikes,
+                    negativeRatingsModel: RatingsDislikes,
+                    selectUserType: 'similar',
+                    rateFactChecked: 1,
+                    rateDiversification: 0.8,
+                },
+                this.postService,
+                this.userService,
+            ),
         };
     }
 
@@ -101,6 +149,8 @@ export class AlgoService {
         suggestionType: AlgoSuggestionType,
     ): Promise<PromiseRejectedResult[]> {
         logger.info(this.constructor.name, 'computeForUser', 'Computing for', user);
+
+        console.log(suggestionType);
 
         const result = await Promise.allSettled([
             this.similarityComputer.computeForUser(user),

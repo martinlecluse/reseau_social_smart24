@@ -10,6 +10,11 @@ export interface IAlgoSuggestion {
     others: IAlgoSuggestionOther[];
 }
 
+export interface IAlgoParams {
+    rateFactChecked: number;
+    rateDiversification: number;
+}
+
 const AlgoSuggestionOtherSchema = new Schema<IAlgoSuggestionOther>({
     item: { type: Schema.Types.ObjectId, ref: 'Post', required: true },
     weight: { type: Number, required: true },
