@@ -1,6 +1,8 @@
 <template>
-    <div>
-      <textarea v-model="message" placeholder="Write your post here..."></textarea>
+    <div class="post-form">
+      <div class="post-text">
+        <textarea v-model="message"  placeholder="Write your post here..."></textarea>
+      </div>
       <button @click="postMessage" class="button">Post</button>
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     </div>
@@ -34,21 +36,22 @@ export default {
 </script>
   
 <style scoped>
-div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-}
-textarea {
+.post-form{
   width: 100%;
-  height: 200px;
-  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin-bottom: 5vh;
 }
 
-button {
-  padding: 10px 20px;
+
+.post-text{
+  height: 50%;
+  width:100%;
+  margin-bottom: 5vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .error {

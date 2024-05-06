@@ -11,10 +11,12 @@ const props = defineProps([
 const comments = ref();
 let commentText = defineModel('commentText');
 
+const emits = defineEmits(['comment-sent']);
 const loadComments = ref(false);
 
 async function sendComment() {
     const resp = (await axios.post('/posts/comment', { text : commentText.value, parentPostId : props.parentPostId}));
+    emits('comment-sent');
     console.log(resp);
 }
 
@@ -34,7 +36,9 @@ onMounted( async () => {
             </div>
         </div>
         <div class="comment-form">
-            <textarea v-model="commentText" class="comment-input" placeholder="Write a comment"></textarea>
+            <div class="comment-input" >
+                <textarea v-model="commentText" placeholder="Write a comment"></textarea>
+            </div>
             <button class="button comment-button" @click="sendComment">Send</button>
         </div>
     </div>
@@ -46,23 +50,24 @@ onMounted( async () => {
     flex-direction: column;
     align-items: center;
     gap: 1rem;
+    overflow:auto;
+    max-height:50vh;
     width: 70%;
-}
-.comments-content {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    margin-bottom: 5vh;
 }
 
 .comment-form{
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
     gap: 1rem;
     width: 100%;
+
 }
+
 .comment-input{
-    height: 10vh;
+    display:flex;
+    justify-content: center;
+    width: 100%;
 }
 
 .comment-button{

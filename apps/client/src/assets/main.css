@@ -64,8 +64,14 @@ textarea{
   border-radius: 1rem;
   padding: 1rem;
   border:none;
+  width: 80%;
+  height:max-content;
 }
 
 .right-box{
   display: flex;
+}
+
+.creator-username{
+  font-weight: 600;
 }

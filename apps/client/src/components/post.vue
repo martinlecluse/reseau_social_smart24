@@ -34,9 +34,6 @@ const dateInstance = new Date(props.info.date);
 const showFactChecks = ref(false);
 const loadComments = ref(false);
 
-const switchShowFactChecks = () => {
-    showFactChecks.value = !showFactChecks.value;
-}
 
 const handleFactCheckStatus = (status) => {
     if (status === 'success') {
@@ -55,9 +52,20 @@ const openCommentsPanel = () => {
     loadComments.value = true
 }
 
+const closeFeedComment = async () => {
+    loadComments.value = false;
+    metric.value = await getMetrics();
+}
+
 async function getMetrics() {
     const res = await axios.get(`/posts/${props.info._id}/metrics`);
     return res.data;
+}
+
+async function switchShowFactChecks (){
+    showFactChecks.value = !showFactChecks.value;
+    metric.value = await getMetrics();
+    return showFactChecks.value;
 }
 
 async function likePost() {
@@ -134,7 +142,7 @@ function checkIfUserHasLiked(list) {
             <div class="post-footer">
                 <div class="post-footer-left"> 
                     <div v-if="props.userIsFactChecker" class="comment-icon-container">  
-                        <button class="post-btn" @click="factCheckPost">
+                        <button class="post-btn" @click="switchShowFactChecks">
                             <span class="post-btn-icon material-symbols-outlined">verified</span>
                             <span class="post-btn-count">{{metric.nbFactChecks}}</span>
                         </button>
@@ -189,14 +197,27 @@ function checkIfUserHasLiked(list) {
                 </div>
                 
                 <div class="post-footer-right">
+                    <p class="post-creator-username">
+                        <router-link :to="{ name: 'profile', params: { profileId: props.info.createdBy._id } }">
+                            {{ props.info.createdBy.username }}
+                        </router-link>
+                    </p>
                     <p class="post-date">{{ dateInstance.toLocaleString('fr-FR') }}</p>
                 </div>
             </div>
         </div>
     </div>
     <div v-if="loadComments">
-        <modal><FeedComment :parentPostId="info._id"></FeedComment></modal>
-
+        <modal @close="closeFeedComment"><FeedComment :parentPostId="info._id" @comment-sent="closeFeedComment"></FeedComment></modal>
+    </div>
+    <div v-if="showFactChecks">
+        <modal @close="switchShowFactChecks">
+            <FeedFactCheck 
+                :parentPostId="props.info._id" 
+                :userIsFactChecker="userIsFactChecker" 
+                @postStatus="handleFactCheckStatus">
+            </FeedFactCheck>
+        </modal>
     </div>
 
 
@@ -208,6 +229,9 @@ h1, h2, h3, h4, h5, h6, p {
     margin: 0;
 }
 
+.post-creator-username{
+    font-weight: 600;
+}
 .post {
     font-family: 'inter', sans-serif;
     display: flex;

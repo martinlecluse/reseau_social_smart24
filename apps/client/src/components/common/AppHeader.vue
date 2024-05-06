@@ -19,19 +19,21 @@ const logout = () => {
             <AppLogo size="40px"/>
             <div class="info-user">
                 <div class="info-user-avatar"></div>
-                <span class="info-user-username">{{ userInfoStore.getUserInfo.username }}</span>
+                <router-link :to="{ name: 'profile', params: { profileId: userInfoStore.getUserInfo._id } }">
+                    <span class="info-user-username">{{ userInfoStore.getUserInfo.username }}</span>
+                </router-link>
             </div>
         </div>
 
         <nav>
             <slot name="nav">
                 <router-link to="/homepage">
-                    <button class="btn btn-primary b">Feed</button>
+                    <button class="button">Feed</button>
                 </router-link>
                 <router-link to="/settings">
-                    <button class="btn btn-primary b">Settings</button>
+                    <button class="button">Settings</button>
                 </router-link>
-                <button class="btn btn-primary b" @click="logout">Logout</button>
+                <button class="button" @click="logout">Logout</button>
             </slot>
         </nav>
     </header>
