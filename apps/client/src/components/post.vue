@@ -169,6 +169,11 @@ function modifDiagram(){
 
 
 
+<<<<<<< HEAD
+=======
+// Définir le dégradé conique en fonction de la valeur de factCheckScore
+// progressBar.style.background = "conic-gradient(#green 0deg , #4caf50 " + factCheckScore + "%, #f2f2f2 " + factCheckScore + "%)";
+>>>>>>> 929daa9158de723db27f8c36878272b8c1b2a156
 
 
 </script>
@@ -243,7 +248,11 @@ function modifDiagram(){
                         </button>
                     </div>
 
+<<<<<<< HEAD
                     <div id="progressBar" class="progress-bar">
+=======
+                    <div id=progressBar class="progress-bar" @click="switchShowFactChecks">
+>>>>>>> 929daa9158de723db27f8c36878272b8c1b2a156
                         <div id="progress">{{metric.factCheckScore}}</div>
                     </div>
 
@@ -252,7 +261,7 @@ function modifDiagram(){
                 
                 <div class="post-footer-right">
                     <p class="post-creator-username">
-                        <router-link :to="{ name: 'profile', params: { profileId: props.info.createdBy._id } }">
+                        <router-link v-if="props.info.createdBy && props.info.createdBy._id" :to="{ name: 'profile', params: { profileId: props.info.createdBy._id } }">
                             {{ props.info.createdBy.username }}
                         </router-link>
                     </p>
