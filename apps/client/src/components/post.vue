@@ -158,15 +158,12 @@ function modifDiagram(){
     getProportionFactCheck();
     // Récupérer l'élément de la barre de progression
     var progressBar = document.getElementById(props.info._id);
-    console.log(progressBar);
     // Définir le dégradé conique en fonction de la valeur de factCheckScore
    
     let myList=[factCheckZero.value,factCheckOne.value,factCheckTwo.value];
 
     myList.sort((a, b) => a - b);
 
-    console.log("nbFactChecks",metric.value.nbFactChecks);
-console.log("id = ",props.info._id);
     if(factCheckOne==0 && factCheckTwo==0 && factCheckZero==0){
         progressBar.style.backgroundColor = "gray";
     }else{
@@ -251,8 +248,8 @@ console.log("id = ",props.info._id);
                         </button>
                     </div>
 
-                    <div class="post-btn-grp">
-                        <div v-if="props.info.metrics.nbFactChecks!=0" v-bind:id=props.info._id class="progress-bar" @click="switchShowFactChecks">
+                    <div v-if="metric.nbFactChecks!=0" class="post-btn-grp">
+                        <div v-bind:id=props.info._id class="progress-bar" @click="switchShowFactChecks">
                             <div id="progress">{{metric.factCheckScore}}</div>
                         </div>
                      </div>
