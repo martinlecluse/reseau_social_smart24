@@ -34,9 +34,6 @@ const dateInstance = new Date(props.info.date);
 const showFactChecks = ref(false);
 const loadComments = ref(false);
 
-const switchShowFactChecks = () => {
-    showFactChecks.value = !showFactChecks.value;
-}
 
 const handleFactCheckStatus = (status) => {
     if (status === 'success') {
@@ -58,6 +55,12 @@ const openCommentsPanel = () => {
 async function getMetrics() {
     const res = await axios.get(`/posts/${props.info._id}/metrics`);
     return res.data;
+}
+
+async function switchShowFactChecks (){
+    showFactChecks.value = !showFactChecks.value;
+    metric.value = await getMetrics();
+    return showFactChecks.value;
 }
 
 async function likePost() {
@@ -134,7 +137,7 @@ function checkIfUserHasLiked(list) {
             <div class="post-footer">
                 <div class="post-footer-left"> 
                     <div v-if="props.userIsFactChecker" class="comment-icon-container">  
-                        <button class="post-btn" @click="factCheckPost">
+                        <button class="post-btn" @click="switchShowFactChecks">
                             <span class="post-btn-icon material-symbols-outlined">verified</span>
                             <span class="post-btn-count">{{metric.nbFactChecks}}</span>
                         </button>
@@ -197,6 +200,15 @@ function checkIfUserHasLiked(list) {
     <div v-if="loadComments">
         <modal><FeedComment :parentPostId="info._id"></FeedComment></modal>
 
+    </div>
+    <div v-if="showFactChecks">
+        <modal @close="switchShowFactChecks">
+            <FeedFactCheck 
+                :parentPostId="props.info._id" 
+                :userIsFactChecker="userIsFactChecker" 
+                @postStatus="handleFactCheckStatus">
+            </FeedFactCheck>
+        </modal>
     </div>
 
 
