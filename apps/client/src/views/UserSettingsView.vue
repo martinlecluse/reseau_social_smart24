@@ -7,6 +7,7 @@ import  { ref } from 'vue'
 import { useTokenStore } from '../stores/auth'
 import { computed } from "vue";
 import AppHeader from "@/components/common/AppHeader.vue";
+import AppLayout from "@/components/common/AppLayout.vue";
 
 const loaded = ref(false);
 
@@ -51,8 +52,8 @@ onMounted(async () => {
     token.value = computed(() => tokenStore.getToken).value;
 
     //get all info
-    userData.value = (await axios.get('/user/' + userId.value)).data;
-    console.log("after axios" + userData.value);
+     userData.value = (await axios.get('/user/' + userId.value)).data;
+     
     //important not to crush values saved in the db in case user clicks on "valider"
     newFactCheckedRate.value = userData.value.parameters.rateFactChecked;
     newDiversityRate.value = userData.value.parameters.rateDiversification;
@@ -63,18 +64,55 @@ onMounted(async () => {
 </script>
 
 <template>
-    <AppHeader></AppHeader>
+    <AppLayout>
+        <div class="content" v-if="loaded">
+            <section>
+                <h1 class="section-title">Profile</h1>
 
-    <div class="content" v-if="loaded">
-        <section>
-            <h1 class="section-title">Profile</h1>
+                <div class="subsection">
+                    <h2 class="subsection-title">Personal information</h2>
+                    
+                    <div class="field">
+                        <p class="field-title">Name</p>
+                        <input class="field-content" disabled :value="userData.name + ' ' + userData.surname" />
+                    </div>
+                    <div class="field">
+                        <p class="field-title">Email</p>
+                        <input class="field-content" disabled :value="userData.mail" />
+                    </div>
+                    <div class="field" v-if="userData.factChecker">
+                        <p class="field-title">Organization</p>
+                        <input class="field-content" disabled :value="userData.organization" />
+                    </div>
+                </div>
+            </section>
 
-            <div class="subsection">
-                <h2 class="subsection-title">Personal information</h2>
+            <section>
+                <h1 class="section-title">Settings</h1>
+
+                <p class="std text">Here, you can choose the way you want the public feed to look like</p>
+                <div class="subsection">
+                    <h2 class="subsection-title">Feed</h2>
+
+                    <div>
+                        <div class="field">
+                            <p class="field-title">Fact-checking <span class="field-value">{{newFactCheckedRate}} %</span></p>
+                            <input class="field-content" type="range" min="0" max="100" step="10" :value="newFactCheckedRate" @change="handleFactCheckRateChange" @input="handleFactCheckRateChange" />
+                        </div>
+                        <p class="field-info">Set the rate of fact-checked posts in your feed</p>
+                    </div>
+                    <div>
+                        <div class="field">
+                            <p class="field-title">Diversity <span class="field-value">{{newDiversityRate}} %</span></p>
+                            <input class="field-content" type="range" min="0" max="100" step="10" :value="newDiversityRate" @change="handleDiversityRateChange" @input="handleDiversityRateChange" />
+                        </div>
+                        <p class="field-info">Set the rate of posts that will be out of your current interest centers (sounds exciting !)</p>
+                    </div>
+                </div>
                 
-                <div class="field">
-                    <p class="field-title">Name</p>
-                    <input class="field-content" disabled :value="userData.name + ' ' + userData.surname" />
+                <div class="submit">
+                    <button class="btn btn-primary" @click="updateUserParams" :disabled="!changed">Save</button>
+                    <p class="submit-message">{{ savedMessage }}</p>
                 </div>
                 <div class="field">
                     <p class="field-title">Email</p>
@@ -84,37 +122,37 @@ onMounted(async () => {
                     <p class="field-title">Organization</p>
                     <input class="field-content" disabled :value="userData.organization" />
                 </div>
-            </div>
-        </section>
-
-        <section>
-            <h1 class="section-title">Settings</h1>
-
-            <p class="std text">Here, you can choose the way you want the public feed to look like</p>
-            <div class="subsection">
-                <h2 class="subsection-title">Feed</h2>
-
-                <div>
-                    <div class="field">
-                        <p class="field-title">Fact-checking <span class="field-value">{{newFactCheckedRate}} %</span></p>
-                        <input class="field-content" type="range" min="0" max="100" step="10" :value="newFactCheckedRate" @change="handleFactCheckRateChange" @input="handleFactCheckRateChange" />
-                    </div>
-                    <p class="field-info">Set the rate of fact-checked posts in your feed</p>
-                </div>
-                <div>
-                    <div class="field">
-                        <p class="field-title">Diversity <span class="field-value">{{newDiversityRate}} %</span></p>
-                        <input class="field-content" type="range" min="0" max="100" step="10" :value="newDiversityRate" @change="handleDiversityRateChange" @input="handleDiversityRateChange" />
-                    </div>
-                    <p class="field-info">Set the rate of posts that will be out of your current interest centers (sounds exciting !)</p>
-                </div>
-            </div>
             
-            <div class="submit">
-                <button class="button" @click="updateUserParams" :disabled="!changed">Save</button>
-                <p class="submit-message">{{ savedMessage }}</p>
-            </div>
-        </section>
+            </section>
+
+            <section>
+                <h1 class="section-title">Settings</h1>
+
+                <p class="std text">Here, you can choose the way you want the public feed to look like</p>
+                <div class="subsection">
+                    <h2 class="subsection-title">Feed</h2>
+
+                    <div>
+                        <div class="field">
+                            <p class="field-title">Fact-checking <span class="field-value">{{newFactCheckedRate}} %</span></p>
+                            <input class="field-content" type="range" min="0" max="100" step="10" :value="newFactCheckedRate" @change="handleFactCheckRateChange" @input="handleFactCheckRateChange" />
+                        </div>
+                        <p class="field-info">Set the rate of fact-checked posts in your feed</p>
+                    </div>
+                    <div>
+                        <div class="field">
+                            <p class="field-title">Diversity <span class="field-value">{{newDiversityRate}} %</span></p>
+                            <input class="field-content" type="range" min="0" max="100" step="10" :value="newDiversityRate" @change="handleDiversityRateChange" @input="handleDiversityRateChange" />
+                        </div>
+                        <p class="field-info">Set the rate of posts that will be out of your current interest centers (sounds exciting !)</p>
+                    </div>
+                </div>
+                
+                <div class="submit">
+                    <button class="button" @click="updateUserParams" :disabled="!changed">Save</button>
+                    <p class="submit-message">{{ savedMessage }}</p>
+                </div>
+            </section>
 
 
         <!-- <div v-if="loaded" class="panel profile">
@@ -180,6 +218,7 @@ onMounted(async () => {
             </div>
         </div> -->
     </div>
+</AppLayout>
 </template>
 
 <style scoped>
@@ -189,13 +228,10 @@ h1, h2, h3, h4, h5, h6, p {
 }
 
 .content {
-    padding-top: 70px;
     display: flex;
     flex-direction: column;
     gap: 24px;
-    padding: 94px 12px 24px 12px;
-    max-width: 800px;
-    margin: 0 auto;
+    padding: 24px 12px;
 }
 
 section {

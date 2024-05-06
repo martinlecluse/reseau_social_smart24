@@ -34,7 +34,6 @@ const UserSchema: Schema<IUser> = new Schema<IUser>({
     username: { type: String, required: true, maxLength: 100, unique: true },
     passwordHash: { type: String, required: true, maxLength: 256 },
     factChecker: { type: Boolean, required: false, default: false },
-    totalPosts: { type: Number, required: false, default: 0 },
     nbFactChecked: { type: Number, required: false, default: 0 },
     organization: { type: String, required: false, maxLength: 100 },
     posts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
@@ -42,8 +41,8 @@ const UserSchema: Schema<IUser> = new Schema<IUser>({
     trustedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     untrustedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     parameters: {
-        rateFactChecked: { type: Number, required: false },
-        rateDiversification: { type: Number, required: false },
+        rateFactChecked: { type: Number, required: true, default: 0 },
+        rateDiversification: { type: Number, required: true, default: 0 },
     },
 });
 

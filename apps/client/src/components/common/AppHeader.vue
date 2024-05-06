@@ -51,7 +51,8 @@ header {
     width: 100%;
     padding: 0 24px;
     z-index: 100;
-    border-bottom: solid 1px rgb(231, 231, 231);
+    border-bottom: solid 1px rgb(240, 240, 240);
+    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.025);
 }
 
 .identity {

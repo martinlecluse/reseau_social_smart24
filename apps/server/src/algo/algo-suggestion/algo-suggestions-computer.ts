@@ -10,23 +10,34 @@ import { logger } from '../../utils/logger';
 import { IAlgoField, IAlgoFieldOther } from '../../models/algo/algo-field';
 import _ from 'underscore';
 import { IRatings } from 'src/models/ratings/ratings';
+import { IPost } from '../../models/post';
+import { PostService } from '../../services/post-service/post-service';
+import { IMetrics } from '../../models/metrics';
+import { UserService } from '../../services/user-service';
 
-export const ALGO_SUGGESTION_TYPES = ['default', 'reconf1', 'reconf2', 'reco-divers'] as const;
+export const ALGO_SUGGESTION_TYPES = ['default', 'reconf1', 'reconf2', 'reco-divers', 'reco-fact-check'] as const;
 
 export type AlgoSuggestionType = (typeof ALGO_SUGGESTION_TYPES)[number];
 export type AlgoSuggestionsDict = { [key in AlgoSuggestionType]: AlgoSuggestionComputer };
+export type ItemForComputation = Exclude<Document & IPost, 'metrics'> & { metrics: IMetrics };
 
 export interface AlgoSuggestionConfig {
     kTopUsers: number;
     selectUserType: 'similar' | 'confidence';
     positiveRatingsModel: Model<IRatings>;
     negativeRatingsModel: Model<IRatings>;
+    rateFactChecked: number;
+    rateDiversification: number;
 }
 
 export abstract class AlgoSuggestionComputer<
     Config extends AlgoSuggestionConfig = AlgoSuggestionConfig,
 > extends AlgoComputer<IAlgoSuggestion> {
-    constructor(protected readonly config: Config) {
+    constructor(
+        protected readonly config: Config,
+        protected readonly postService: PostService,
+        protected readonly userService: UserService,
+    ) {
         super();
     }
 
@@ -37,13 +48,18 @@ export abstract class AlgoSuggestionComputer<
      * @returns The computed suggestions
      */
     async computeForUser(user: NonStrictObjectId): Promise<IAlgoSuggestion & Document> {
+        const userDiversificationRate = (await this.userService.getUser(user)).parameters.rateDiversification;
+        this.config.rateDiversification = userDiversificationRate;
+
         const [similarEntry, confidenceEntry] = await getAlgoFieldEntry(user, [AlgoSimilar, AlgoConfidence]);
 
         if (!similarEntry || !confidenceEntry) {
             return AlgoSuggestion.create({ user, others: [] });
         }
 
-        const topUsers = this.getTopUsers(this.config.selectUserType === 'similar' ? similarEntry : confidenceEntry);
+        const topUsers = await this.getTopUsers(
+            this.config.selectUserType === 'similar' ? similarEntry : confidenceEntry,
+        );
 
         const [positiveRatings, negativeRatings, allItems] = await Promise.all([
             getRatedItemsForUser(user, this.config.positiveRatingsModel),
@@ -64,10 +80,15 @@ export abstract class AlgoSuggestionComputer<
         logger.debug(this.constructor.name, 'computeForUser', `Found ${items.length} items from top users`);
 
         // Compute weights for each item
-        const suggestions: IAlgoSuggestionOther[] = await Promise.all(
+        const findCompleteItems = await Promise.all(
             items.map(async (item) => ({
-                item,
-                weight: await this.computeWeight(item, similarEntry, confidenceEntry),
+                itemObject: await this.postService.getPost(item),
+            })),
+        );
+        const suggestions: IAlgoSuggestionOther[] = await Promise.all(
+            findCompleteItems.map(async (itemObject) => ({
+                item: itemObject.itemObject._id,
+                weight: await this.computeWeight(itemObject.itemObject, similarEntry, confidenceEntry),
             })),
         );
 
@@ -77,12 +98,12 @@ export abstract class AlgoSuggestionComputer<
     }
 
     protected async computeWeight(
-        item: Types.ObjectId,
+        item: ItemForComputation,
         similarEntry: IAlgoField,
         confidenceEntry: IAlgoField,
     ): Promise<number> {
         const raters = await getRatingUsersFromItemWithWeights(
-            item,
+            item._id,
             [this.config.positiveRatingsModel, this.config.negativeRatingsModel],
             [1, -1],
         );
@@ -95,6 +116,7 @@ export abstract class AlgoSuggestionComputer<
 
         for (const [other, direction] of raters) {
             const weight = this.computeWeightForItem(
+                item,
                 similarOthersDict[other.toString()],
                 confidenceOthersDict[other.toString()],
             );
@@ -105,15 +127,20 @@ export abstract class AlgoSuggestionComputer<
             }
         }
 
-        logger.debug(this.constructor.name, 'computeWeight', 'Computed weight for', item, 'as', numerator / count);
+        logger.debug(this.constructor.name, 'computeWeight', 'Computed weight for', item._id, 'as', numerator / count);
 
         return count ? numerator / count : 0;
     }
 
     protected abstract computeWeightForItem(
+        item: ItemForComputation,
         similarOther: IAlgoFieldOther | undefined,
         confidenceOther: IAlgoFieldOther | undefined,
     ): number | null;
+
+    protected async getTopUsers(userEntry: IAlgoField): Promise<IAlgoFieldOther[]> {
+        return userEntry.others.sort((a, b) => b.score - a.score).slice(0, this.config.kTopUsers);
+    }
 
     protected async createOrUpdate(
         user: NonStrictObjectId,
@@ -126,10 +153,5 @@ export abstract class AlgoSuggestionComputer<
         }
 
         return AlgoSuggestion.create({ user, others });
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    protected getTopUsers(userEntry: IAlgoField): IAlgoFieldOther[] {
-        return userEntry.others.sort((a, b) => b.score - a.score).slice(0, this.config.kTopUsers);
     }
 }
