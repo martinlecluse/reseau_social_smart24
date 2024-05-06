@@ -4,7 +4,7 @@ import AppHeader from "@/components/common/AppHeader.vue";
 import feed from "../components/common/feed.vue"
 import '../assets/main.css'
 import { useUserInfoStore } from "../stores/userInfo";
-import { computed, onMounted, ref, defineProps } from "vue";
+import { computed, onMounted, ref, defineProps, watchEffect } from "vue";
 import axios from 'axios'
 import AppLayout from "@/components/common/AppLayout.vue";
 
@@ -38,10 +38,11 @@ const fetchInfos = async (userId: string) => {
     userProfileFactchecker.value = (JSON.stringify(response.data.userData.factChecker) == "true")
     posts.value = (JSON.parse(JSON.stringify(response.data.lastPosts)));
 
-    if(JSON.stringify(response.data.userData.trustedUsers).includes(userProfileId)){
+    const otherResponse = await axios.get(`user/${currentUserId.value}/profile`)
+    if(JSON.stringify(otherResponse.data.userData.trustedUsers).includes(userProfileId)){
       let trusted = document.getElementsByClassName('trust');
       trusted[0].setAttribute('id', 'trusted');
-    } else if(JSON.stringify(response.data.userData.untrustedUsers).includes(userProfileId)){
+    } else if(JSON.stringify(otherResponse.data.userData.untrustedUsers).includes(userProfileId)){
       let unTrusted = document.getElementsByClassName('untrust');
       unTrusted[0].setAttribute('id', 'unTrusted');
     }
@@ -92,6 +93,10 @@ async function unTrustUser(){
   await axios.post('/user/untrustUser', {user: currentUserId.value, otherUserId: props.profileId});
 }
 
+watchEffect(async () => {
+  userProfileId = props.profileId;
+  await fetchInfos(userProfileId);
+});
 </script>
 
 <style>
