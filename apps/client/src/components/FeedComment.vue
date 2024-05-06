@@ -35,10 +35,10 @@ onMounted( async () => {
                 <Comment :comment="comment"></Comment>
             </div>
         </div>
-        <div class="comment-form">
-            <textarea v-model="commentText" class="comment-input" placeholder="Write a comment"></textarea>
-            <button class="comment-button" @click="sendComment">Send</button>
-        </div>
+    </div>
+    <div class="comment-form">
+        <textarea v-model="commentText" class="comment-input" placeholder="Write a comment"></textarea>
+        <button class="comment-button" @click="sendComment">Send</button>
     </div>
 </template>
 
