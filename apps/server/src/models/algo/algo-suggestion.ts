@@ -17,7 +17,7 @@ export interface IAlgoParams {
 }
 
 const AlgoSuggestionOtherSchema = new Schema<IAlgoSuggestionOther>({
-    item: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    item: { type: Schema.Types.ObjectId, ref: 'Post', required: true },
     weight: { type: Number, required: true },
 });
 

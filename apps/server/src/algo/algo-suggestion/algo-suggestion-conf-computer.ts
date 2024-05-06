@@ -25,26 +25,20 @@ export class AlgoSuggestionConfidenceComputer<
     }
 
     protected async getTopUsers(userEntry: IAlgoField): Promise<IAlgoFieldOther[]> {
-        
-        let selectedUsers = userEntry.others.sort((a, b) => b.score - a.score).slice(0, this.config.kTopUsers);
-
-        console.log("SELECTED USERS BEFORE TRUST/UNSTRUST : " + selectedUsers)
 
         const userObject = (await this.userService.getUser(userEntry.user));
         const trustedUsers = userObject.trustedUsers;
         const untrustedUsers = userObject.untrustedUsers;
 
-        console.log("TRUSTED USERS : " + trustedUsers);
-        console.log("UNTRUSTED USERS : " + untrustedUsers);
-
-        selectedUsers.forEach( (other) => {
-            other.score += ((trustedUsers.find(e => e = other.user) !== undefined) ? this.config.offsetTrustedUsers : 0 );
-            other.score -= ((untrustedUsers.find(e => e = other.user) !== undefined) ? this.config.offsetTrustedUsers : 0 );
+        userEntry.others.forEach((other) => {
+            other.score = other.score
+                            + ((trustedUsers.find(e => e = other.user) !== undefined) ? this.config.offsetTrustedUsers : 0 )
+                            - ((untrustedUsers.find(e => e = other.user) !== undefined) ? this.config.offsetTrustedUsers : 0 );
         })
 
-        selectedUsers = selectedUsers.sort((a, b) => b.score - a.score);
-
-        console.log("SELECTED USERS AFTER TRUST/UNSTRUST : " + selectedUsers)
+        let selectedUsers = userEntry.others
+            .sort((a, b) => b.score - a.score)
+            .slice(0, this.config.kTopUsers);
         
         return selectedUsers;
     }
