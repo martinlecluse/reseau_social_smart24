@@ -192,6 +192,7 @@ function checkIfUserHasLiked(list) {
                 </div>
                 
                 <div class="post-footer-right">
+                    <p class="post-creator-username">{{ props.info.createdBy.username }}</p>
                     <p class="post-date">{{ dateInstance.toLocaleString('fr-FR') }}</p>
                 </div>
             </div>
@@ -220,6 +221,9 @@ h1, h2, h3, h4, h5, h6, p {
     margin: 0;
 }
 
+.post-creator-username{
+    font-weight: 600;
+}
 .post {
     font-family: 'inter', sans-serif;
     display: flex;
