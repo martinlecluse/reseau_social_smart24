@@ -1,27 +1,45 @@
 <script setup>
+import { ref } from "vue";
 
 const props = defineProps([
     'comment'
 ]);
+const likedBy = ref(false);
+const unlikedBy = ref(false);
+
+async function likePost() {
+    likedBy.value = !likedBy.value;
+}
+
+async function dislikePost() {
+    unlikedBy.value = !unlikedBy.value;
+}
 
 </script>
 
 <template>
     <div class="comment-header">
-        <h2 class="createdBy creator-username">{{ comment.createdBy.username }}</h2>
+        <h2 class="comment-username">{{ comment.createdBy.username }}</h2>
         <p class="date">{{ comment.date }}</p>
     </div>
     <div class="comment-content">
         <p class="std">{{ comment.text }}</p>
     </div>
     <div class="comment-footer">
-        <div class="comment-footer-left">
-            <button class="material-symbols-outlined button-post green">
-                thumb_up
-            </button>                   
-            <button class="material-symbols-outlined button-post red">
-                thumb_down
-            </button>   
+        <div class="post-btn-grp comment-btn-grp">
+            <button v-if="likedBy" class="post-btn post-btn-active post-btn-green" @click="likePost">
+                <span class="post-btn-icon material-symbols-outlined">thumb_up</span>
+            </button>
+            <button v-else class="post-btn" @click="likePost">
+                <span class="post-btn-icon material-symbols-outlined">thumb_up</span>
+            </button>
+
+            <button v-if="unlikedBy" class="post-btn post-btn-active post-btn-red" @click="dislikePost">
+                <span class="post-btn-icon material-symbols-outlined">thumb_down</span>
+            </button>
+            <button v-else class="post-btn" @click="dislikePost">
+                <span class="post-btn-icon material-symbols-outlined">thumb_down</span>
+            </button> 
         </div>
     </div>
 </template>
@@ -32,13 +50,30 @@ const props = defineProps([
 .comment-header{
     display: flex;
     justify-content: flex-start;
+    align-items: center;
+
+}
+
+.comment-username{
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
 }
 
 .date{
     font-size: 0.8rem;
 }
 
+.comment-footer{
+    display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .comment-content {
-    margin: 0 0 0 1em;
+    font-size: 0.9em;
+}
+
+.comment-btn-grp{
+    scale:0.7;
 }
 </style>

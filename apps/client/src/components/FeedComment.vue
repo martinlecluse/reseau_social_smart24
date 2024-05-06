@@ -29,14 +29,14 @@ onMounted( async () => {
 </script>
 
 <template>
-    <div class="comments">
+    <div class="form-container">
         <div v-if="loadComments" class="comments-content">
             <div v-for="comment in comments" :key="comment._id" class="comment">
                 <Comment :comment="comment"></Comment>
             </div>
         </div>
-        <div class="comment-form">
-            <div class="comment-input" >
+        <div class="form">
+            <div class="input" >
                 <textarea v-model="commentText" placeholder="Write a comment"></textarea>
             </div>
             <button class="button comment-button" @click="sendComment">Send</button>
@@ -45,32 +45,15 @@ onMounted( async () => {
 </template>
 
 <style scoped>
-.comments {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    overflow:auto;
-    max-height:50vh;
-    width: 70%;
-    margin-bottom: 5vh;
-}
-
-.comment-form{
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 100%;
-
-}
-
-.comment-input{
-    display:flex;
-    justify-content: center;
-    width: 100%;
-}
 
 .comment-button{
     justify-self: flex-end;
+}
+.comments-content{
+    width:80%;
+}
+
+.comment{
+    margin-bottom: 5vh;
 }
 </style>
