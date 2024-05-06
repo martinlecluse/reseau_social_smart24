@@ -202,7 +202,7 @@ function checkIfUserHasLiked(list) {
                             {{ props.info.createdBy.username }}
                         </router-link>
 
-		<router-link v-if="props.info.createdBy && (props.info.createdBy[0].username && props.info.createdBy[0]._id)" :to="{ name: 'profile', params: { profileId: props.info.createdBy[0]._id } }">
+		<router-link v-if="props.info.createdBy[0] && (props.info.createdBy[0].username && props.info.createdBy[0]._id)" :to="{ name: 'profile', params: { profileId: props.info.createdBy[0]._id } }">
                             {{ props.info.createdBy[0].username }}
                         </router-link>
                     </p>
