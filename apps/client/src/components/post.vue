@@ -198,7 +198,7 @@ function checkIfUserHasLiked(list) {
                 
                 <div class="post-footer-right">
                     <p class="post-creator-username">
-                        <router-link :to="{ name: 'profile', params: { profileId: props.info.createdBy._id } }">
+                        <router-link v-if="props.info.createdBy && props.info.createdBy._id" :to="{ name: 'profile', params: { profileId: props.info.createdBy._id } }">
                             {{ props.info.createdBy.username }}
                         </router-link>
                     </p>
