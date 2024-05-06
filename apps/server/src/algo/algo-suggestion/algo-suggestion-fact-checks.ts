@@ -1,8 +1,5 @@
 import { IAlgoFieldOther } from '../../models/algo/algo-field';
 import { AlgoSuggestionDefaultComputer } from './algo-suggestions-default-computer';
-import { Types, Document } from 'mongoose';
-import { IMetrics, Metrics } from '../..//models/metrics';
-import { IPost, Post } from '../../models/post';
 import { ItemForComputation } from './algo-suggestions-computer';
 import { AlgoSuggestionConfidenceConfig } from './algo-suggestion-conf-computer';
 
@@ -22,7 +19,7 @@ export class AlgoSuggestionFactChecksComputer<
         let secondaryOther: IAlgoFieldOther | undefined;
         let primaryCoefficient: number;
         let secondaryCoefficient: number;
-        let factCheckCoefficient: number = this.config.factCheckCoefficient;
+        const factCheckCoefficient: number = this.config.factCheckCoefficient;
 
         if (this.config.selectUserType === 'confidence') {
             primaryOther = confidenceOther;
@@ -37,18 +34,18 @@ export class AlgoSuggestionFactChecksComputer<
         }
 
         const nbFactChecks = item.metrics.nbFactChecks;
-        console.log("NB FACT-CHECKS : " + nbFactChecks)
         let factCheckScore: number = 0; //no fact-chceks => no impact
 
         if (nbFactChecks > 0) {
             factCheckScore = item.metrics.factCheckScore - 1.5; //below mean => degradation
-            console.log("FACT-CHECK SCORE : " + factCheckScore)
         }
 
         if (primaryOther) {
             if (secondaryOther) {
                 return (
-                    (primaryOther.score / primaryCoefficient + secondaryOther.score / secondaryCoefficient + factCheckScore / factCheckCoefficient) /
+                    (primaryOther.score / primaryCoefficient +
+                        secondaryOther.score / secondaryCoefficient +
+                        factCheckScore / factCheckCoefficient) /
                     (primaryCoefficient + secondaryCoefficient)
                 );
             } else {

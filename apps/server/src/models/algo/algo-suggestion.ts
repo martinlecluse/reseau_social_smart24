@@ -1,5 +1,4 @@
-import mongoose, { Schema, Types, Document } from 'mongoose';
-import { IPost, Post } from '../post';
+import mongoose, { Schema, Types } from 'mongoose';
 
 export interface IAlgoSuggestionOther {
     item: Types.ObjectId;
@@ -12,8 +11,8 @@ export interface IAlgoSuggestion {
 }
 
 export interface IAlgoParams {
-    rateFactChecked: number,
-    rateDiversification: number
+    rateFactChecked: number;
+    rateDiversification: number;
 }
 
 const AlgoSuggestionOtherSchema = new Schema<IAlgoSuggestionOther>({

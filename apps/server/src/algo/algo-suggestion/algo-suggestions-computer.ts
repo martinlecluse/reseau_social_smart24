@@ -1,7 +1,7 @@
-import { AlgoSuggestion, IAlgoParams, IAlgoSuggestion, IAlgoSuggestionOther } from '../../models/algo/algo-suggestion';
+import { AlgoSuggestion, IAlgoSuggestion, IAlgoSuggestionOther } from '../../models/algo/algo-suggestion';
 import { AlgoComputer } from '../algo-computer';
 import { NonStrictObjectId } from '../../utils/objectid';
-import { Document, Model, Types} from 'mongoose';
+import { Document, Model, Types } from 'mongoose';
 import { AlgoSimilar } from '../../models/algo/algo-similar';
 import { AlgoConfidence } from '../../models/algo/algo-confidence';
 import { getAlgoFieldEntry } from '../../utils/algo-field';
@@ -10,7 +10,7 @@ import { logger } from '../../utils/logger';
 import { IAlgoField, IAlgoFieldOther } from '../../models/algo/algo-field';
 import _ from 'underscore';
 import { IRatings } from 'src/models/ratings/ratings';
-import { IPost, Post } from '../../models/post';
+import { IPost } from '../../models/post';
 import { PostService } from '../../services/post-service/post-service';
 import { IMetrics } from '../../models/metrics';
 import { UserService } from '../../services/user-service';
@@ -19,7 +19,7 @@ export const ALGO_SUGGESTION_TYPES = ['default', 'reconf1', 'reconf2', 'reco-div
 
 export type AlgoSuggestionType = (typeof ALGO_SUGGESTION_TYPES)[number];
 export type AlgoSuggestionsDict = { [key in AlgoSuggestionType]: AlgoSuggestionComputer };
-export type ItemForComputation = Exclude<(Document<any, any, any> & IPost), 'metrics'> & {'metrics': IMetrics}
+export type ItemForComputation = Exclude<Document & IPost, 'metrics'> & { metrics: IMetrics };
 
 export interface AlgoSuggestionConfig {
     kTopUsers: number;
@@ -36,7 +36,8 @@ export abstract class AlgoSuggestionComputer<
     constructor(
         protected readonly config: Config,
         protected readonly postService: PostService,
-        protected readonly userService: UserService) {
+        protected readonly userService: UserService,
+    ) {
         super();
     }
 
@@ -47,8 +48,7 @@ export abstract class AlgoSuggestionComputer<
      * @returns The computed suggestions
      */
     async computeForUser(user: NonStrictObjectId): Promise<IAlgoSuggestion & Document> {
-
-        let userDiversificationRate = (await this.userService.getUser(user)).parameters.rateDiversification;
+        const userDiversificationRate = (await this.userService.getUser(user)).parameters.rateDiversification;
         this.config.rateDiversification = userDiversificationRate;
 
         const [similarEntry, confidenceEntry] = await getAlgoFieldEntry(user, [AlgoSimilar, AlgoConfidence]);
@@ -57,7 +57,9 @@ export abstract class AlgoSuggestionComputer<
             return AlgoSuggestion.create({ user, others: [] });
         }
 
-        const topUsers = await this.getTopUsers(this.config.selectUserType === 'similar' ? similarEntry : confidenceEntry);
+        const topUsers = await this.getTopUsers(
+            this.config.selectUserType === 'similar' ? similarEntry : confidenceEntry,
+        );
 
         const [positiveRatings, negativeRatings, allItems] = await Promise.all([
             getRatedItemsForUser(user, this.config.positiveRatingsModel),
@@ -79,14 +81,12 @@ export abstract class AlgoSuggestionComputer<
 
         // Compute weights for each item
         const findCompleteItems = await Promise.all(
-            items
-            .map(async (item) => ({
-                itemObject: await this.postService.getPost(item)
-            }))
+            items.map(async (item) => ({
+                itemObject: await this.postService.getPost(item),
+            })),
         );
         const suggestions: IAlgoSuggestionOther[] = await Promise.all(
-            findCompleteItems
-            .map(async (itemObject) => ({
+            findCompleteItems.map(async (itemObject) => ({
                 item: itemObject.itemObject._id,
                 weight: await this.computeWeight(itemObject.itemObject, similarEntry, confidenceEntry),
             })),
@@ -138,7 +138,7 @@ export abstract class AlgoSuggestionComputer<
         confidenceOther: IAlgoFieldOther | undefined,
     ): number | null;
 
-    protected async getTopUsers(userEntry: IAlgoField): Promise<IAlgoFieldOther[]>{
+    protected async getTopUsers(userEntry: IAlgoField): Promise<IAlgoFieldOther[]> {
         return userEntry.others.sort((a, b) => b.score - a.score).slice(0, this.config.kTopUsers);
     }
 
@@ -154,5 +154,4 @@ export abstract class AlgoSuggestionComputer<
 
         return AlgoSuggestion.create({ user, others });
     }
-    
 }
