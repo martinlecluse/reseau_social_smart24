@@ -96,11 +96,7 @@ export class PostService {
         let suggestions: ItemForComputation[] = [];
         const suggestionsIds: IAlgoSuggestionOther[] = (await AlgoSuggestion.findOne({ user: userId }))!.others;
 
-        await Promise.all(
-            suggestionsIds.map(async (so: IAlgoSuggestionOther) => {
-                suggestions.push(await this.getPost(so.item));
-            }),
-        );
+        suggestions = await Promise.all(suggestionsIds.map(async (so) => this.getPost(so.item)));
 
         //measure output relative to goal in terms of fact-checked posts
         const goalFactChecked: number = (userParams.rateFactChecked / 100) * 200;
@@ -135,12 +131,17 @@ export class PostService {
         }
 
         const nbSuggestions = suggestions.length;
+
         if (nbSuggestions < 200) {
             const nbFactChecked = suggestions.slice(0, 200).filter((sug) => sug.metrics.nbFactChecks > 0).length;
             const diffFactCheckedPostsToAdd: number = goalFactChecked - nbFactChecked; //nb of fact-checked posts to add to the feed (only >= 0 at this point)
 
             //fills missing posts with random posts
             const nbSuggToAdd = 200 - nbSuggestions;
+
+
+	          const suggestionsToAdd = await Post.find({ _id: { $nin: suggestions } }).populate('createdBy', 'username _id').populate('metrics').limit(nbSuggToAdd);
+
             const factCheckPipeline = [
                 {
                     $lookup: {
@@ -205,6 +206,7 @@ export class PostService {
             const factCheckedSuggestionsToAdd = await Post.aggregate(factCheckPipeline);
             const notFactCheckedSuggestionsToAdd = await Post.aggregate(notFactChekedPipeline);
 
+            //suggestions = suggestions.concat(suggestionsToAdd);
             suggestions = suggestions.concat(factCheckedSuggestionsToAdd).concat(notFactCheckedSuggestionsToAdd);
         }
 
