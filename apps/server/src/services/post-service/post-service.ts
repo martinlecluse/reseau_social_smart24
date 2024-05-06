@@ -93,32 +93,15 @@ export class PostService {
             200,
         );
 
-        await Promise.all(
-            suggestionsIds.map(async (so: IAlgoSuggestionOther) => {
-                suggestions.push(await this.getPost(so.item));
-            }),
-        );
+        suggestions = await Promise.all(suggestionsIds.map(async (so) => this.getPost(so.item)));
 
         const nbSuggestions = suggestions.length;
 
         if (nbSuggestions < 200) {
             //fills missing posts with random posts
             const nbSuggToAdd = 200 - nbSuggestions;
-	
-	const pipeline = [
-	    { $match: { _id: { $nin: suggestions } } },
-	    { $sample: { size: nbSuggToAdd } }, 
-	    {
-	        $lookup: {
-		from: "metrics", 
-		localField: "metrics", 
-		foreignField: "_id",
-		as: "metrics"
-	        }
-	    }
-	];
 
-            const suggestionsToAdd = await Post.aggregate(pipeline);
+	const suggestionsToAdd = await Post.find({ _id: { $nin: suggestions } }).populate('createdBy', 'username _id').populate('metrics').limit(nbSuggToAdd);
 
             suggestions = suggestions.concat(suggestionsToAdd);
         }
