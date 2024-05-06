@@ -47,6 +47,36 @@ body {
   font-style: italic;
 }
 
+.button{
+  border: none;
+  background: #242323;
+  color: white;
+  padding: 0.5rem 2.5rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  align-self: flex-end;
+  display: flex;
+  justify-content: center;
+  align-self: center;
+
+}
+
+textarea{
+  background: #d9d9d9;
+  border-radius: 1rem;
+  padding: 1rem;
+  border:none;
+  width: 80%;
+  height:max-content;
+}
+
+.right-box{
+  display: flex;
+}
+
+.creator-username{
+  font-weight: 600;
+}
 .div-h1{
   font-size: 5rem;
   font-weight: 700;
