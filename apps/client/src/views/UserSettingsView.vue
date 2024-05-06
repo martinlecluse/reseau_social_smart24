@@ -111,44 +111,6 @@ onMounted(async () => {
                 </div>
                 
                 <div class="submit">
-                    <button class="btn btn-primary" @click="updateUserParams" :disabled="!changed">Save</button>
-                    <p class="submit-message">{{ savedMessage }}</p>
-                </div>
-                <div class="field">
-                    <p class="field-title">Email</p>
-                    <input class="field-content" disabled :value="userData.mail" />
-                </div>
-                <div class="field" v-if="userData.factChecker">
-                    <p class="field-title">Organization</p>
-                    <input class="field-content" disabled :value="userData.organization" />
-                </div>
-            
-            </section>
-
-            <section>
-                <h1 class="section-title">Settings</h1>
-
-                <p class="std text">Here, you can choose the way you want the public feed to look like</p>
-                <div class="subsection">
-                    <h2 class="subsection-title">Feed</h2>
-
-                    <div>
-                        <div class="field">
-                            <p class="field-title">Fact-checking <span class="field-value">{{newFactCheckedRate}} %</span></p>
-                            <input class="field-content" type="range" min="0" max="100" step="10" :value="newFactCheckedRate" @change="handleFactCheckRateChange" @input="handleFactCheckRateChange" />
-                        </div>
-                        <p class="field-info">Set the rate of fact-checked posts in your feed</p>
-                    </div>
-                    <div>
-                        <div class="field">
-                            <p class="field-title">Diversity <span class="field-value">{{newDiversityRate}} %</span></p>
-                            <input class="field-content" type="range" min="0" max="100" step="10" :value="newDiversityRate" @change="handleDiversityRateChange" @input="handleDiversityRateChange" />
-                        </div>
-                        <p class="field-info">Set the rate of posts that will be out of your current interest centers (sounds exciting !)</p>
-                    </div>
-                </div>
-                
-                <div class="submit">
                     <button class="button" @click="updateUserParams" :disabled="!changed">Save</button>
                     <p class="submit-message">{{ savedMessage }}</p>
                 </div>
