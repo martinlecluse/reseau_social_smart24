@@ -12,6 +12,7 @@ import { AlgoFieldComputer } from '../algo-field-computer';
 import { AlgoSimilar } from '../../models/algo/algo-similar';
 import { AlgoConfidence } from '../../models/algo/algo-confidence';
 import { IPost } from '../../models/post';
+import { UserService } from '../../services/user-service';
 
 const DEFAULT_USER_1 = {
     username: 'mikewards',
@@ -19,6 +20,10 @@ const DEFAULT_USER_1 = {
     passwordHash: 'ripjeremy',
     name: 'Mike',
     surname: 'Wards',
+    parameters: {
+        ratedDiversification: 1,
+        rateFactChecked: 1
+    }
 };
 
 const DEFAULT_USER_2 = {
@@ -27,6 +32,10 @@ const DEFAULT_USER_2 = {
     passwordHash: 'avertissement',
     name: 'Jean-René',
     surname: 'Dufort',
+    parameters: {
+        ratedDiversification: 0,
+        rateFactChecked: 0
+    }
 };
 
 const DEFAULT_USER_3 = {
@@ -35,6 +44,10 @@ const DEFAULT_USER_3 = {
     passwordHash: 'lovemacron',
     name: 'Justin',
     surname: 'Trudeau',
+    parameters: {
+        ratedDiversification: 0.5,
+        rateFactChecked: 0.5
+    }
 };
 
 describe('AlgoSuggestionComputer', () => {
@@ -48,6 +61,10 @@ describe('AlgoSuggestionComputer', () => {
     let post4: IPost & Document;
 
     beforeEach(() => {
+
+        const postService = container.resolve(PostService);
+        const userService = container.resolve(UserService);
+
         similarityComputer = new AlgoFieldComputer(AlgoSimilar, RatingsLikes, RatingsDislikes);
         confidenceComputer = new AlgoFieldComputer(AlgoConfidence, RatingsLikes, RatingsDislikes);
         algoSuggestionComputer = new AlgoSuggestionDefaultComputer({
@@ -55,7 +72,11 @@ describe('AlgoSuggestionComputer', () => {
             selectUserType: 'similar',
             positiveRatingsModel: RatingsLikes,
             negativeRatingsModel: RatingsDislikes,
-        });
+            rateDiversification: 0.2,
+            rateFactChecked: 1
+        },
+        postService,
+        userService)
     });
 
     beforeEach(async () => {
