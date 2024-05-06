@@ -9,7 +9,7 @@ const props = defineProps([
 ]);
 
 const comments = ref();
-let commentText;
+let commentText = defineModel('commentText');
 
 const loadComments = ref(false);
 
@@ -29,7 +29,7 @@ onMounted( async () => {
 <template>
     <div class="comments">
         <div v-if="loadComments" class="comments-content">
-            <div v-for="comment in comments" :key="comment.title" class="comment">
+            <div v-for="comment in comments" :key="comment._id" class="comment">
                 <Comment :comment="comment"></Comment>
             </div>
         </div>

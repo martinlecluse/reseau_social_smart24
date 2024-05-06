@@ -2,15 +2,14 @@ import User, { IUser, IUserCreation } from '../models/user';
 import { Post } from '../models/post';
 import { singleton } from 'tsyringe';
 import { StatusCodes } from 'http-status-codes';
+import { Document, Types, UpdateQuery } from 'mongoose';
 import { HttpException } from '../models/http-exception';
-import { Document, UpdateQuery, Types } from 'mongoose';
 import { NonStrictObjectId, toObjectId } from '../utils/objectid';
-import bcryptjs from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { env } from '../utils/env';
 
 @singleton()
 export class UserService {
+    constructor() {}
+
     async getUser(userId: NonStrictObjectId): Promise<IUser> {
         const user = await User.findById(userId);
 
@@ -19,34 +18,6 @@ export class UserService {
         }
 
         return user;
-    }
-
-    public async login(username: string, password: string) {
-        const foundUser = await User.findOne({ username });
-
-        if (!foundUser) {
-            throw new Error('UserName of user is not correct');
-        }
-
-        const isMatch = bcryptjs.compareSync(password, foundUser.passwordHash);
-
-        if (isMatch) {
-            const token = jwt.sign({ _id: foundUser._id?.toString(), name: foundUser.name }, env.SECRET_KEY, {
-                expiresIn: '2 days',
-            });
-
-            return {
-                user: {
-                    id: foundUser._id,
-                    name: foundUser.name,
-                    surname: foundUser.surname,
-                    username: foundUser.username,
-                },
-                token: token,
-            };
-        } else {
-            throw new Error('Password is not correct');
-        }
     }
 
     async createUser(user: IUserCreation): Promise<IUser & Document> {
@@ -78,6 +49,10 @@ export class UserService {
         }
         const updatedUser = await User.findByIdAndUpdate(userObjectId, update, { new: true });
         return updatedUser;
+    }
+
+    async addPostId(userId: NonStrictObjectId, postId: NonStrictObjectId) {
+        await User.updateOne({ _id: userId }, { $push: { posts: postId } }, { new: false }).exec();
     }
 
     async trustUser(userId: NonStrictObjectId, otherUserId: NonStrictObjectId) {
