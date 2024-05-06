@@ -31,8 +31,8 @@ export class AlgoSuggestionConfidenceComputer<
 
         userEntry.others.forEach((other) => {
             other.score = other.score
-                            + ((trustedUsers.find(e => e = other.user) !== undefined) ? this.config.offsetTrustedUsers : 0 )
-                            - ((untrustedUsers.find(e => e = other.user) !== undefined) ? this.config.offsetTrustedUsers : 0 );
+                            + ((trustedUsers.find(e => e == other.user) !== undefined) ? this.config.offsetTrustedUsers : 0 )
+                            - ((untrustedUsers.find(e => e == other.user) !== undefined) ? this.config.offsetTrustedUsers : 0 );
         })
 
         let selectedUsers = userEntry.others
