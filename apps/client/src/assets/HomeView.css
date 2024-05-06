@@ -61,7 +61,7 @@ body {
     display: flex;
     align-items: center;
     width: 75%;
-    margin-bottom: 7%;
+    margin-bottom: 1%;
 }
 
 .line {
@@ -88,6 +88,7 @@ body {
     color: #fff;
     border: none;
     border-radius: 5px;
+    margin-top: 7%;
     margin-bottom: 7%;
     font-family: 'inter', sans-serif;
     font-weight: bold;

@@ -29,6 +29,7 @@ export class UserService {
 
         const newUser = new User({ ...user, passwordHash: user.password });
         await newUser.save();
+        
 
         return newUser;
     }

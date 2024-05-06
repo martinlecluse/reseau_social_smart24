@@ -51,7 +51,8 @@ onMounted(async () => {
     token.value = computed(() => tokenStore.getToken).value;
 
     //get all info
-    userData.value = (await axios.get('/user/' + userId.value)).data;
+     userData.value = (await axios.get('/user/' + userId.value)).data;
+     
     //important not to crush values saved in the db in case user clicks on "valider"
     newFactCheckedRate.value = userData.value.parameters.rateFactChecked;
     newDiversityRate.value = userData.value.parameters.rateDiversification;

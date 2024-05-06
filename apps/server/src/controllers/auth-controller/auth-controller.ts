@@ -7,10 +7,15 @@ import { StatusCodes } from 'http-status-codes';
 import { IUserCreation } from '../../models/user';
 import { singleton } from 'tsyringe';
 import { AuthRequest, auth } from '../../middleware/auth';
+import { AlgoService } from '../../services/algo-service/algo-service';
+import { AlgoSuggestionType } from '../../algo/algo-suggestion/algo-suggestions-computer';
 
 @singleton()
 export class AuthController extends AbstractController {
-    constructor(private readonly authService: AuthService) {
+    constructor(
+        private readonly authService: AuthService,
+        private readonly algoService: AlgoService
+    ) {
         super();
     }
 
@@ -49,18 +54,23 @@ export class AuthController extends AbstractController {
                         throw new HttpException(StatusCodes.BAD_REQUEST, 'Invalid request', errors);
                     }
 
-                    res.status(StatusCodes.CREATED).send(
-                        await this.authService.signup({
-                            username: req.body.username,
-                            mail: req.body.mail,
-                            password: req.body.password,
-                            name: req.body.name,
-                            surname: req.body.surname,
-                            birthday: req.body.birthday,
-                            factChecker: req.body.factChecker,
-                            organization: req.body.organization,
-                        }),
-                    );
+
+	        const newUser = await this.authService.signup({
+                        username: req.body.username,
+                        mail: req.body.mail,
+                        password: req.body.password,
+                        name: req.body.name,
+                        surname: req.body.surname,
+                        birthday: req.body.birthday,
+                        factChecker: req.body.factChecker,
+                        organization: req.body.organization,
+                    });
+
+                    res.status(StatusCodes.CREATED).send(newUser);
+
+	        await this.algoService.computeForUser(newUser.user._id, 'default' as AlgoSuggestionType);
+
+	        
                 } catch (e) {
                     next(e);
                 }
