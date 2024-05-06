@@ -10,6 +10,8 @@ import { UserService } from '../user-service';
 import { AlgoSuggestion, IAlgoParams, IAlgoSuggestionOther } from '../../models/algo/algo-suggestion';
 import { ItemForComputation } from 'src/algo/algo-suggestion/algo-suggestions-computer';
 
+const _ = require('underscore');
+
 @singleton()
 export class PostService {
     constructor(private readonly userService: UserService) {}
@@ -98,120 +100,202 @@ export class PostService {
 
         suggestions = await Promise.all(suggestionsIds.map(async (so) => this.getPost(so.item)));
 
-        //measure output relative to goal in terms of fact-checked posts
+
+        //Nombres de factcheck
         const goalFactChecked: number = (userParams.rateFactChecked / 100) * 200;
-        const outputFactChecked: number = suggestions
+        const postFactCheckInSuggestion = suggestions
             .slice(0, 200)
-            .filter((sug) => sug.metrics.nbFactChecks > 0).length; //feed : 200 suggestions so compare only on this part of the output
-        const differenceOutputGoal: number = outputFactChecked - goalFactChecked;
-
-        const filterFunction = (post: ItemForComputation) => {
-            //too much fact-checks, we KEEP the un-fact-checked
-            //unsufficient number or fact-checks, we KEEP the fact-checked
-            return differenceOutputGoal > 0 ? post.metrics.nbFactChecks == 0 : post.metrics.nbFactChecks != 0;
-        };
-
-        const removeItems = (sugList: ItemForComputation[], diff: number) => {
-            const sortedSugList: ItemForComputation[] = sugList
-                .sort((post) => (filterFunction(post) ? 1 : 0))
-                .filter((post) => filterFunction(post))
-                .slice(Math.abs(diff));
-
-            return sugList.filter((post) => !sortedSugList.includes(post));
-        };
-
-        if (differenceOutputGoal != 0) {
-            //keep only correctly guessed remaining posts after position 200
-            const possibleSuggestions = suggestions.slice(201).filter((post) => filterFunction(post));
-            //filter the current feed
-            const firstSuggestions = removeItems(suggestions.slice(0, 200).reverse(), differenceOutputGoal); //IMPORTANT : reverse because order is important
-
-            //update sugestions
-            suggestions = firstSuggestions.concat(possibleSuggestions.slice(0, differenceOutputGoal));
-        }
+              .filter((sug) => sug.metrics.nbFactChecks > 0);
+        const outputFactChecked: number = postFactCheckInSuggestion.length;
+        
+        let differenceOutputGoal: number = outputFactChecked - goalFactChecked; // <0 = manque des factcheck | >0 = trop de factcheck
 
         const nbSuggestions = suggestions.length;
 
-        if (nbSuggestions < 200) {
-            const nbFactChecked = suggestions.slice(0, 200).filter((sug) => sug.metrics.nbFactChecks > 0).length;
-            const diffFactCheckedPostsToAdd: number = goalFactChecked - nbFactChecked; //nb of fact-checked posts to add to the feed (only >= 0 at this point)
+        //Recup des post factchecker pas dans suggestions
+        let otherPostFactChecked = [];
+        if (differenceOutputGoal != 0) {
+	const pipeline = [
+	    {
+	        $lookup: {
+		from: "metrics",
+		localField: "metrics",
+		foreignField: "_id",
+		as: "metrics"
+	        }
+	    },
+	    {
+	        $unwind: "$metrics"
+	    },
+	    {
+	        $match: {
+		"metrics.nbFactChecks": { $gt: 0 },
+		_id: { $nin: _.pluck(postFactCheckInSuggestion, '_id') }
+	        }
+	    },
+	    {
+	        $lookup: {
+		from: 'users',
+		localField: 'createdBy',
+		foreignField: '_id',
+		as: 'createdBy'
+	        }
+	    }
+	];
 
-            //fills missing posts with random posts
-            const nbSuggToAdd = 200 - nbSuggestions;
+	otherPostFactChecked = await Post.aggregate(pipeline);
 
+	if (differenceOutputGoal < 0) {
+	    differenceOutputGoal = otherPostFactChecked.length * -1;
+	}
+	else {
+	    differenceOutputGoal = otherPostFactChecked.length;
+	}
 
-	          const suggestionsToAdd = await Post.find({ _id: { $nin: suggestions } }).populate('createdBy', 'username _id').populate('metrics').limit(nbSuggToAdd);
-
-            const factCheckPipeline = [
-                {
-                    $lookup: {
-                        from: 'metrics',
-                        localField: '_id',
-                        foreignField: 'postId',
-                        as: 'metrics',
-                    },
-                },
-                {
-                    $match: {
-                        'metrics.nbFactChecks': { $gt: 0 }, //keep fact-checked posts
-                    },
-                },
-                { $sample: { size: diffFactCheckedPostsToAdd } },
-                {
-                    $lookup: {
-                        from: 'users',
-                        localField: 'createdBy',
-                        foreignField: '_id',
-                        as: 'createdBy',
-                    },
-                },
-                {
-                    $project: {
-                        username: '$createdBy.username',
-                        _id: '$createdBy._id',
-                    },
-                },
-            ];
-            const notFactChekedPipeline = [
-                {
-                    $lookup: {
-                        from: 'metrics',
-                        localField: '_id',
-                        foreignField: 'postId',
-                        as: 'metrics',
-                    },
-                },
-                {
-                    $match: {
-                        'metrics.nbFactChecks': { $lt: 0 }, //keep un-fact-checked posts
-                    },
-                },
-                { $sample: { size: nbSuggToAdd - diffFactCheckedPostsToAdd } },
-                {
-                    $lookup: {
-                        from: 'users',
-                        localField: 'createdBy',
-                        foreignField: '_id',
-                        as: 'createdBy',
-                    },
-                },
-                {
-                    $project: {
-                        username: '$createdBy.username',
-                        _id: '$createdBy._id',
-                    },
-                },
-            ];
-
-            const factCheckedSuggestionsToAdd = await Post.aggregate(factCheckPipeline);
-            const notFactCheckedSuggestionsToAdd = await Post.aggregate(notFactChekedPipeline);
-
-            //suggestions = suggestions.concat(suggestionsToAdd);
-            suggestions = suggestions.concat(factCheckedSuggestionsToAdd).concat(notFactCheckedSuggestionsToAdd);
         }
+
+
+        //Si pas assez de posts
+        if (nbSuggestions < 200) {
+
+
+	if (differenceOutputGoal < 0) {
+
+
+	    
+	    suggestions = suggestions.concat(otherPostFactChecked.slice(0, -differenceOutputGoal));
+	    
+	}
+
+	else if (differenceOutputGoal > 0) {
+
+	    this.deletePost(suggestions, differenceOutputGoal, true);
+	    
+	}
+
+	const nbSuggToAdd = 200 - suggestions.length;
+
+	if (nbSuggToAdd > 0) {
+	    
+
+	    const suggestionsToAdd = await Post.aggregate(
+	        [
+		{ $match: { _id: { $nin: _.pluck(suggestions, '_id') } } },
+		{ $limit: nbSuggToAdd },
+		{
+		    $lookup: {
+		        from: 'users',
+		        localField: 'createdBy',
+		        foreignField: '_id',
+		        as: 'createdBy'
+		    }
+		},
+		{
+		    $lookup: {
+		        from: 'metrics',
+		        localField: 'metrics',
+		        foreignField: '_id',
+		        as: 'metrics'
+		    }
+		}
+	        ]
+	    );
+
+	    suggestions = suggestions.concat(suggestionsToAdd);
+	}
+	
+        }
+
+        //Si trop ou le bon nombre de posts
+        if (nbSuggestions >= 200) {
+
+
+	suggestions = suggestions.slice(0,200);
+	
+	if (differenceOutputGoal < 0) {
+
+	    //Verification des suggestions suivant les 200
+	    const other = suggestions.slice(201).filter((sug) => sug.metrics.nbFactChecks > 0);
+
+	    this.deletePost(suggestions, -differenceOutputGoal, false);
+
+	    
+	    suggestions = suggestions.concat(other.slice(0, -differenceOutputGoal));
+
+	    if (other.length < -differenceOutputGoal) {
+
+
+	        suggestions = suggestions.concat(otherPostFactChecked.slice(0, -differenceOutputGoal - other.length));
+
+	        
+	    }
+
+	}
+
+	else if (differenceOutputGoal > 0) {
+
+	    this.deletePost(suggestions, differenceOutputGoal, true);
+	    
+
+	}
+
+	
+				
+	const nbSuggToAdd = 200 - suggestions.length;
+
+	if (nbSuggToAdd > 0) {
+	    
+
+	    const suggestionsToAdd = await Post.aggregate(
+	        [
+		{ $match: { _id: { $nin: _.pluck(suggestions, '_id') } } },
+		{ $limit: nbSuggToAdd },
+		{
+		    $lookup: {
+		        from: 'users',
+		        localField: 'createdBy',
+		        foreignField: '_id',
+		        as: 'createdBy'
+		    }
+		},
+		{
+		    $lookup: {
+		        from: 'metrics',
+		        localField: 'metrics',
+		        foreignField: '_id',
+		        as: 'metrics'
+		    }
+		}
+	        ]
+	    );
+
+	    suggestions = suggestions.concat(suggestionsToAdd);
+
+	}
+
+        }
+	
 
         return {
             suggestions: suggestions,
         };
+
+    }
+
+    private deletePost(posts : ItemForComputation[], nb : number, factchecked : boolean) {
+        for (let i = posts.length-1; i >= 0; i--) {
+
+	const condition = factchecked ? (posts[i].metrics.nbFactChecks > 0) : (posts[i].metrics.nbFactChecks === 0);
+	
+	if (condition) {
+	    posts.splice(i,1);
+	    nb--;
+	}
+	if (nb == 0) {
+	    break;
+	}
+        }
     }
 }
+	
+
