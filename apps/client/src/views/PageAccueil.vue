@@ -4,9 +4,9 @@ import feed from "../components/common/feed.vue"
 import { useUserInfoStore } from "../stores/userInfo";
 import axios from "axios";
 import { onMounted, ref } from "vue";
-import BandeauHomepage from "../components/common/BandeauHomepage.vue";
-import modal from "../components/pop-ups/modal.vue";
-import NewPost from "../components/NewPost.vue";
+import AppHeader from "@/components/common/AppHeader.vue";
+import modal from "@/components/pop-ups/modal.vue";
+import NewPost from "@/components/NewPost.vue";
 
 const loadFeed = ref(false);
 
@@ -22,6 +22,15 @@ const switchShowCreateNewPost = () => {
     showCreateNewPost.value = !showCreateNewPost.value;
 }
 
+const handleNewPostStatus = (status: string) => {
+    if (status === 'success') {
+      switchShowCreateNewPost();
+    } else {
+        alert('An error occurred while posting your message');
+    }
+}
+
+
 onMounted(async () => {
     let userInfo = store.getUserInfo;
 
@@ -30,48 +39,64 @@ onMounted(async () => {
     userIsFactChecker.value = userInfo.isFactChecker === "true" ? true : false;
 
     try {
+
         posts.value = (await axios.get('/posts/getSuggestions')).data.suggestions;
+
         console.log(posts.value)
         loadFeed.value = true;
     } catch (error) {
         console.error("Erreur lors de la récupération des posts :", error);
     }
 });
+
 </script>
 
 <template>
+    <AppHeader></AppHeader>
+
     <div class="mainFeed">
-        <header>        
-            <BandeauHomepage :username="username"/>
-        </header>
-        <div class="screen">
-            <button class="btn btn-primary b" @click="switchShowCreateNewPost">Post</button>
+        <main>
+            <div class="options">
+                <button class="btn btn-primary b" @click="switchShowCreateNewPost">
+                    Create a new post
+                </button>
+            </div>
+
             <feed v-if="loadFeed" :posts="posts" :isFactChecker="userIsFactChecker"></feed>
-            <modal v-if="showCreateNewPost" @close="switchShowCreateNewPost">
-                <NewPost @postStatus="handlePostStatus"/>
-            </modal>
-        </div>
+        </main>
     </div>
+
+    <modal v-if="showCreateNewPost" @close="switchShowCreateNewPost">
+        <NewPost @postStatus="handleNewPostStatus"/>
+    </modal>
 </template>
 
 <style scoped>
+
 .mainFeed{
     width:100%;
     height:100vh;
+    padding-top: 70px;
     display: flex;
     flex-direction: column;
     align-items: center;
     overflow: auto;
-background-image: linear-gradient(to bottom, #f7e1e1 50%, #B9ABAB 100%);
+    background-image: linear-gradient(to bottom, #f7e1e1 50%, #B9ABAB 100%);
 }
 
-
-.screen{
-    width: 100%;
-    height: 100%;
-    margin-top:7vh;
-    display:flex;
-    justify-content: center;
-    padding: 1em 0 1em 0;
+main {
+    margin: 0 auto;
+    padding: 24px 12px;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
 }
+
+.options {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
 </style>

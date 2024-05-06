@@ -7,13 +7,21 @@ const tokenStore = useTokenStore();
 const userInfoStore = useUserInfoStore();
 
 const username = ref('');
-const password = ref('');
+ const password = ref('');
+
+ const error = ref('');
 
 async function login() {
-    const res = await tokenStore.login({username : username.value, password : password.value});
-    console.log(res.data.user)
-    userInfoStore.update(res.data.user);
-    window.location.href = '/homepage';
+
+     const res = await tokenStore.login({username : username.value, password : password.value});
+
+     if (res.data.user) {
+         userInfoStore.update(res.data.user);
+         window.location.href = '/homepage';
+     }
+     else {
+         error.value = res.data.message;
+     }
 }
 
 function redirectToRegister() {
@@ -24,6 +32,11 @@ function redirectToRegister() {
 <template>
 
     <div class="container">
+
+        <div v-if="error != ''" id="error-message" class="alert alert-danger" role="alert" >
+	{{ error }}
+        </div>
+        
         <form class="login-form" @submit.prevent="login">
             <input type="username" class="input-field" placeholder="Username" v-model="username">
             <input type="password" class="input-field" placeholder="Password" v-model="password">
@@ -42,3 +55,14 @@ function redirectToRegister() {
 
 
 </template>
+
+
+<style scoped>
+
+ #error-message {
+     text-align: center;
+     margin-top: 10px;
+     margin-bottom: 0px;
+ }
+
+</style>

@@ -1,13 +1,11 @@
 <script setup lang="ts">
 
-import bandeau from "../components/common/bandeau-settings.vue"
+import AppHeader from "@/components/common/AppHeader.vue";
 import feed from "../components/common/feed.vue"
 import '../assets/main.css'
 import { useUserInfoStore } from "../stores/userInfo";
 import { computed, onMounted, ref, defineProps } from "vue";
 import axios from 'axios'
-
-//Route /profile/663243a7a3df229850bf97c5
 
 const props = defineProps({
   profileId: {
@@ -20,9 +18,6 @@ const store = useUserInfoStore();
 
 let currentUserId = ref('');
 let currentUserUsername = ref('');
-let currentUserName = ref('');
-let currentUserSurname = ref('');
-
 
 let userProfileId: string = props.profileId;
 let userProfileUsername = ref('');
@@ -39,21 +34,19 @@ const fetchInfos = async (userId: string) => {
     userProfileName.value = JSON.stringify(response.data.userData.name).replace(/"/g, '');
     userProfileSurname.value = JSON.stringify(response.data.userData.surname).replace(/"/g, '');
     userProfileFactchecker.value = (JSON.stringify(response.data.userData.factChecker) == "true")
-    posts.value.push(response.data);
+    posts.value = (JSON.parse(JSON.stringify(response.data.lastPosts)));
   } catch (error) {
     console.error(error);
   }
-  console.log(posts);
+  console.log((posts));
 };
 
-onMounted( () => {
+onMounted( async () => {
     //retrieve session information
     const userInfo = computed(()=>store.getUserInfo).value;
     currentUserId.value = userInfo._id!;
     currentUserUsername.value = userInfo.username!;
-    currentUserName.value = userInfo.name!;
-    currentUserSurname.value = userInfo.surname!;
-    fetchInfos(userProfileId);
+    await fetchInfos(userProfileId);
 });
 
 async function buttonTrustUser() {
@@ -95,8 +88,9 @@ async function unTrustUser(){
 </style>
 
 <template>
+  <AppHeader></AppHeader>
+  
   <div class="content">
-    <bandeau :username="currentUserUsername" :firstname="currentUserName" :lastname="currentUserSurname" />
     <div class="user-profile-container">
       <div class="user-profile-infos">
         <strong>
@@ -118,11 +112,15 @@ async function unTrustUser(){
         </button>
       </div>
     </div>
-    <feed :posts="posts" class="posts"></feed>
+    <feed :posts="posts" :isFactChecker="userProfileFactchecker" class="posts"></feed>
   </div>
 </template>
 
 <style scoped>
+  .content {
+    padding-top: 70px;
+  }
+
   .user-profile-container {
     display: flex;
     flex-direction: row;
@@ -171,5 +169,52 @@ async function unTrustUser(){
   .factCheckerTick {
     font-size: 15px;
     margin-left: 5px;
+  }
+  
+  .factCheckerTick:hover:after {
+    display: block;
+    content: "This user is a fact checker";
+    position: absolute;
+    background: #f8f8f8;
+    border-right: 5px solid #dfdfdf;
+    border-bottom: 5px solid #dfdfdf;
+    border-top: 5px solid #dfdfdf;
+    border-left: 5px solid #dfdfdf;
+    padding: 5px;
+    width: auto;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .trust:hover:after {
+    color: black;
+    display: block;
+    content: "Trust user";
+    position: absolute;
+    background: #f8f8f8;
+    border-right: 5px solid #dfdfdf;
+    border-bottom: 5px solid #dfdfdf;
+    border-top: 5px solid #dfdfdf;
+    border-left: 5px solid #dfdfdf;
+    padding: 5px;
+    width: auto;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .untrust:hover:after {
+    color: black;
+    display: block;
+    content: "Untrust user";
+    position: absolute;
+    background: #f8f8f8;
+    border-right: 5px solid #dfdfdf;
+    border-bottom: 5px solid #dfdfdf;
+    border-top: 5px solid #dfdfdf;
+    border-left: 5px solid #dfdfdf;
+    padding: 5px;
+    width: auto;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
   }
 </style>

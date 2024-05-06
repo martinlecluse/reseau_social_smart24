@@ -36,7 +36,7 @@ export class PostService {
 
     async publishComment(userId: NonStrictObjectId, newComment: ICreateComment): Promise<Document & IPost> {
         await this.userService.getUser(userId);
-        await this.getPost(newComment.parentPostId.toString());
+        const post = await this.getPost(newComment.parentPostId.toString());
 
         const metrics = new Metrics({});
         await metrics.save();
@@ -50,6 +50,8 @@ export class PostService {
         });
 
         await comment.save();
+        console.log(post.metrics);
+        await Metrics.findOneAndUpdate(post.metrics._id, { $inc: { nbComments: 1 } });
 
         return comment;
     }
