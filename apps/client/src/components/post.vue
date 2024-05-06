@@ -14,7 +14,6 @@ const props = defineProps({
         direct: Number,
         metrics: Object,
         text: String,
-        factChecks: Array,
     },
     userIsFactChecker: Boolean
 });
@@ -29,7 +28,9 @@ const likedBy = ref(false);
 const unlikedBy = ref(false);
 const trustedBy = ref(false);
 const untrustedBy = ref(false);
-const factCheckOne= ref('');
+let factCheckZero= ref(0);
+let factCheckOne= ref(0);
+let factCheckTwo= ref(0);
 
 
 const dateInstance = new Date(props.info.date);
@@ -49,6 +50,7 @@ const handleFactCheckStatus = (status) => {
 onMounted(async () => {
     metric.value = await getMetrics();
     checkIfUserHasLiked(metric.value);
+    modifDiagram();
 });
 
 const openCommentsPanel = () => {
@@ -67,6 +69,7 @@ async function getMetrics() {
 async function switchShowFactChecks (){
     showFactChecks.value = !showFactChecks.value;
     metric.value = await getMetrics();
+    modifDiagram();
     return showFactChecks.value;
 }
 
@@ -128,23 +131,44 @@ function checkIfUserHasLiked(list) {
 
 function getProportionFactCheck(){
 
-    let nbFactChecks = props.info.factChecks.length;
+    console.log("length",props.info.metrics.factChecks);
+    let nbFactChecks = props.info.metrics.factChecks.length;
 
     for(let i=0 ; i<nbFactChecks ; i++){
-        if(props.info.factChecks[i].status === "true"){
-            factCheckScore++;
+        if(props.info.metrics.factChecks[i].grade==0){
+            console.log("ok0");
+            factCheckZero.value=factCheckZero.value+1;
+        }else if(props.info.metrics.factChecks[i].grade==1){
+            factCheckOne.value=factCheckOne.value+1;
+            console.log("ok1");
+
+        }else if(props.info.metrics.factChecks[i].grade==2){
+            factCheckTwo.value=factCheckTwo.value+1;
+            console.log("ok2");
+
         }
     }
+
+    factCheckZero.value= factCheckZero.value/nbFactChecks;
+    factCheckOne.value= factCheckOne.value/nbFactChecks;
+    factCheckTwo.value= factCheckTwo.value/nbFactChecks;
+
 }
 
-// Récupérer l'élément de la barre de progression
-var progressBar = document.getElementById("progressBar");
+function modifDiagram(){
+    getProportionFactCheck();
+    // Récupérer l'élément de la barre de progression
+    var progressBar = document.getElementById("progressBar");
+    // Définir le dégradé conique en fonction de la valeur de factCheckScore
+    console.log("factChechZero",factCheckZero.value);
+    console.log("factChechOne",factCheckOne.value);
+    console.log("factChechTwo",factCheckTwo.value);
+    progressBar.style.background = "conic-gradient(#green 0% "+ factCheckTwo+"% , #4caf50 " + factCheckTwo + "% "+ factCheckOne +"%, #f2f2f2 " + factCheckOne + "% "+factCheckZero+"%)";
 
-// Récupérer l'élément de progression
-var progressElement = document.getElementById("progress");
+}
 
-// Définir le dégradé conique en fonction de la valeur de factCheckScore
-progressBar.style.background = "conic-gradient(#green 0deg , #4caf50 " + factCheckScore + "%, #f2f2f2 " + factCheckScore + "%)";
+
+
 
 
 </script>
@@ -219,7 +243,7 @@ progressBar.style.background = "conic-gradient(#green 0deg , #4caf50 " + factChe
                         </button>
                     </div>
 
-                    <div id=progressBar class="progress-bar">
+                    <div id="progressBar" class="progress-bar">
                         <div id="progress">{{metric.factCheckScore}}</div>
                     </div>
 
@@ -281,7 +305,6 @@ h1, h2, h3, h4, h5, h6, p {
   color:black;
   font-size: 1.3rem;
   font-family: 'Laila', serif;
-  background: conic-gradient(green 120deg, gray 120deg 240deg,red 240deg 360deg); 
 
 }
 

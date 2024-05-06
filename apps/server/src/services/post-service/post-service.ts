@@ -55,7 +55,10 @@ export class PostService {
     }
 
     async getPost(postId: NonStrictObjectId): Promise<Document & IPost> {
-        const post = await Post.findOne({ _id: postId }).populate('createdBy', 'username _id').populate('metrics');
+        const post = await Post.findOne({ _id: postId }).populate('createdBy', 'username _id').populate({
+            path: 'metrics',
+            populate: { path: 'factChecks' } // Populate factChecks within metrics
+        });
 
         if (!post) {
             throw new HttpException(StatusCodes.NOT_FOUND, `No post found with ID ${postId}`);

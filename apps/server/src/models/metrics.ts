@@ -37,6 +37,6 @@ const MetricsSchema = new Schema<IMetrics>({
     trustedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     untrustedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     sharedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    factChecks: [{ type: Schema.Types.ObjectId, ref: 'FactCheck' }],
+    factChecks: [{ type: Schema.Types.ObjectId, ref: 'fact-checks' }],
 });
 export const Metrics = mongoose.model<IMetrics>('Metrics', MetricsSchema);
