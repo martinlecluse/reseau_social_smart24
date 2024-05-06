@@ -95,35 +95,23 @@ export class PostService {
         );
 
         const nbSuggestions = suggestions.length;
+
         if (nbSuggestions < 200) {
             //fills missing posts with random posts
             const nbSuggToAdd = 200 - nbSuggestions;
-            const pipeline = [
-                { $sample: { size: nbSuggToAdd } },
-                {
-                    $lookup: {
-                        from: 'users',
-                        localField: 'createdBy',
-                        foreignField: '_id',
-                        as: 'createdBy',
-                    },
-                },
-                {
-                    $project: {
-                        username: '$createdBy.username',
-                        _id: '$createdBy._id',
-                    },
-                },
-                {
-                    $lookup: {
-                        from: 'metrics',
-                        localField: '_id',
-                        foreignField: 'postId',
-                        as: 'metrics',
-                    },
-                },
-                { $limit: nbSuggToAdd },
-            ];
+	
+	const pipeline = [
+	    { $match: { _id: { $nin: suggestions } } },
+	    { $sample: { size: nbSuggToAdd } }, 
+	    {
+	        $lookup: {
+		from: "metrics", 
+		localField: "metrics", 
+		foreignField: "_id",
+		as: "metrics"
+	        }
+	    }
+	];
 
             const suggestionsToAdd = await Post.aggregate(pipeline);
 
