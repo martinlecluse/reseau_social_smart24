@@ -8,7 +8,7 @@ const props = defineProps([
 
 <template>
     <div class="comment-header">
-        <h2 class="createdBy">{{ comment.createdBy.username }}</h2>
+        <h2 class="createdBy creator-username">{{ comment.createdBy.username }}</h2>
         <p class="date">{{ comment.date }}</p>
     </div>
     <div class="comment-content">

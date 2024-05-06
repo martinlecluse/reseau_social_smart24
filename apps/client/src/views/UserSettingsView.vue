@@ -111,7 +111,7 @@ onMounted(async () => {
             </div>
             
             <div class="submit">
-                <button class="btn btn-primary" @click="updateUserParams" :disabled="!changed">Save</button>
+                <button class="button" @click="updateUserParams" :disabled="!changed">Save</button>
                 <p class="submit-message">{{ savedMessage }}</p>
             </div>
         </section>

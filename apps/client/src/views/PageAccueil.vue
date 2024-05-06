@@ -57,7 +57,7 @@ onMounted(async () => {
     <div class="mainFeed">
         <main>
             <div class="options">
-                <button class="btn btn-primary b" @click="switchShowCreateNewPost">
+                <button class="button" @click="switchShowCreateNewPost">
                     Create a new post
                 </button>
             </div>
