@@ -18,6 +18,7 @@ const store = useUserInfoStore();
 
 let currentUserId = ref('');
 let currentUserUsername = ref('');
+let currentUserIsFactChecker = ref()
 
 let userProfileId: string = props.profileId;
 let userProfileUsername = ref('');
@@ -46,6 +47,7 @@ onMounted( async () => {
     const userInfo = computed(()=>store.getUserInfo).value;
     currentUserId.value = userInfo._id!;
     currentUserUsername.value = userInfo.username!;
+    currentUserIsFactChecker.value = (userInfo.isFactChecker === "true") ;
     await fetchInfos(userProfileId);
 });
 
@@ -112,7 +114,7 @@ async function unTrustUser(){
         </button>
       </div>
     </div>
-    <feed :posts="posts" :isFactChecker="userProfileFactchecker" class="posts"></feed>
+    <feed :posts="posts" :isFactChecker="currentUserIsFactChecker" class="posts"></feed>
   </div>
 </template>
 

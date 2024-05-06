@@ -65,11 +65,14 @@ onMounted( async () => {
     flex-direction: column;
     align-items: center;
     gap: 1rem;
+    
     width: 70%;
 }
 .comments-content {
     display: flex;
     flex-direction: column;
+    overflow:auto;
+    height:50vh;
     gap: 1rem;
 }
 
