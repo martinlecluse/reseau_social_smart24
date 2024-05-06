@@ -51,7 +51,7 @@ const handleFactCheckStatus = (status) => {
 onMounted(async () => {
     metric.value = await getMetrics();
     checkIfUserHasLiked(metric.value);
-    modifDiagram();
+    await modifDiagram();
 });
 
 const openCommentsPanel = () => {
@@ -71,7 +71,7 @@ async function getMetrics() {
 async function switchShowFactChecks (){
     showFactChecks.value = !showFactChecks.value;
     metric.value = await getMetrics();
-    modifDiagram();
+    await modifDiagram();
     return showFactChecks.value;
 }
 
@@ -131,19 +131,21 @@ function checkIfUserHasLiked(list) {
     }
 }
 
-function getProportionFactCheck(){
+async function getProportionFactCheck(){
 
     let nbFactChecks = props.info.metrics.factChecks.length;
-
-    for(let i=0 ; i<nbFactChecks ; i++){
-        if(props.info.metrics.factChecks[i].grade==0){
+    let factChecks = (await axios.get(`/posts/${props.info._id}/factChecks`)).data;
+    factCheckZero.value=0;
+    factCheckOne.value=0;
+    factCheckTwo.value=0;
+    for(let i=0 ; i<factChecks.length ; i++){
+        if(factChecks[i].grade==0){
             factCheckZero.value=factCheckZero.value+1;
-        }else if(props.info.metrics.factChecks[i].grade==1){
+        }else if(factChecks[i].grade==1){
             factCheckOne.value=factCheckOne.value+1;
 
-        }else if(props.info.metrics.factChecks[i].grade==2){
+        }else if(factChecks[i].grade==2){
             factCheckTwo.value=factCheckTwo.value+1;
-
         }
     }
 
@@ -155,26 +157,17 @@ function getProportionFactCheck(){
     
 }
 
-function modifDiagram(){
-    getProportionFactCheck();
+async function modifDiagram(){
+    await getProportionFactCheck();
     // Récupérer l'élément de la barre de progression
     var progressBar = document.getElementById(props.info._id);
     // Définir le dégradé conique en fonction de la valeur de factCheckScore
    
     let myList=[factCheckZero.value,factCheckOne.value,factCheckTwo.value];
-
-    if(factCheckOne.value==0 && factCheckTwo.value==0 && factCheckZero.value==0){
-        progressBar.style.backgroundColor = "gray";
-    }else{
+    if(progressBar){
         progressBar.style.background = `conic-gradient(orange 0% ${myList[0]}% , gray ${myList[0]}% ${myList[0]+myList[1]}%, green ${myList[0]+myList[1]}% ${myList[0]+myList[1]+myList[2]}%)`;
     }
-
-
 }
-
-
-
-
 </script>
 
 
