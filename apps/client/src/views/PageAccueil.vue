@@ -63,7 +63,7 @@ onMounted(async () => {
         </div>
     </AppLayout>
 
-    <button class="btn btn-primary b create-post-btn" @click="switchShowCreateNewPost">Create a new post</button>
+    <button class="button create-post-btn" @click="switchShowCreateNewPost">Create a new post</button>
 
     <modal v-if="showCreateNewPost" @close="switchShowCreateNewPost">
         <NewPost @postStatus="handleNewPostStatus"/>
