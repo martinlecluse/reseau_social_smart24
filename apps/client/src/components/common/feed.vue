@@ -1,22 +1,69 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <!-- eslint-disable vue/require-v-for-key -->
-<script setup>
+<script setup lang="ts">
+import { defineProps } from 'vue';
 import post from '../post.vue'
-import '../../assets/PageAccueil.css'
-
 
 const props = defineProps({
-    posts: Array // Déclarez le type de la prop 'posts' comme un tableau d'objets
+    posts: Object,
+    isFactChecker: Boolean
 })
 
 </script>
 
 <template>
     <div class="feed">
-        <!-- eslint-disable-next-line vue/require-v-for-key -->
-        <div class="posts" v-for="(item) in props.posts" key="index">
-            <post :post="item"></post>
+        <div class="posts" v-for="(item, index) in  props.posts" :key="index">
+            <post :info="item" :userIsFactChecker="isFactChecker"></post>
         </div>
     </div>
 </template>
 
+<style scoped>
+
+.feed {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background-color: white;
+    border-radius: 12px;
+}
+
+.posts {
+    padding: 24px;
+}
+
+.posts:not(:last-child) {
+    border-bottom: solid 1px rgb(231, 231, 231);
+}
+
+/* .feed{
+    width: 50%;
+    height: 97%;
+
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin-top:2em;
+    margin-bottom: 2em;
+
+    border-radius:30px;
+
+    overflow-y:auto ;
+    padding: 6vh;
+    background-color:whitesmoke;
+}
+
+.posts{
+    width: 100%;
+    height: fit-content;
+
+    margin: 1em 0 1em 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+} */
+
+</style>

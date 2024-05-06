@@ -7,6 +7,7 @@ export interface UpdateMetrics {
     untrustedBy?: mongoose.Types.ObjectId[];
 }
 
+
 export interface IMetrics {
     nbLikes: number;
     nbDislikes: number;

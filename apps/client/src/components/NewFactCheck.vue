@@ -30,12 +30,13 @@ export default {
   methods: {
     async postMessage() {
       try {
-        console.log(this.message);
-        await axios.post('/factCheck/create', {comment: this.message, grade: this.grade, postId: parentPostId});
+        console.log(this.message, this.grade, this.parentPostId);
+        await axios.post('/factCheck/create', {comment: this.message, grade: this.grade, postId: this.parentPostId});
         this.message = '';
         this.errorMessage = '';
         this.$emit('postStatus', 'success');
       } catch (error) {
+        console.log(error);
         this.errorMessage = 'An error occurred while creating your fact check.';
       }
     }

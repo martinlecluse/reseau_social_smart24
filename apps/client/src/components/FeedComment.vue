@@ -9,12 +9,14 @@ const props = defineProps([
 ]);
 
 const comments = ref();
-let commentText;
+let commentText = defineModel('commentText');
 
+const emits = defineEmits(['comment-sent']);
 const loadComments = ref(false);
 
 async function sendComment() {
     const resp = (await axios.post('/posts/comment', { text : commentText.value, parentPostId : props.parentPostId}));
+    emits('comment-sent');
     console.log(resp);
 }
 
@@ -29,7 +31,7 @@ onMounted( async () => {
 <template>
     <div class="comments">
         <div v-if="loadComments" class="comments-content">
-            <div v-for="comment in comments" :key="comment.title" class="comment">
+            <div v-for="comment in comments" :key="comment._id" class="comment">
                 <Comment :comment="comment"></Comment>
             </div>
         </div>
@@ -46,6 +48,8 @@ onMounted( async () => {
     flex-direction: column;
     align-items: center;
     gap: 1rem;
+    overflow:auto;
+    height:50vh;
     width: 70%;
 }
 .comments-content {

@@ -85,7 +85,7 @@ describe('PostController', () => {
                 .expect(StatusCodes.OK)
                 .then((res) => {
                     expect(res.body.text).toEqual(DEFAULT_CREATE_POST.text);
-                    expect(res.body.createdBy).toEqual(user._id.toString());
+                    expect(res.body.createdBy._id).toEqual(user._id.toString());
                 });
         });
 

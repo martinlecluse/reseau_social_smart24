@@ -1,13 +1,11 @@
 <script setup lang="ts">
 
-import bandeau from "../components/common/bandeau-settings.vue"
+import AppHeader from "@/components/common/AppHeader.vue";
 import feed from "../components/common/feed.vue"
 import '../assets/main.css'
 import { useUserInfoStore } from "../stores/userInfo";
 import { computed, onMounted, ref, defineProps } from "vue";
 import axios from 'axios'
-
-//Route /profile/663243a7a3df229850bf97c5
 
 const props = defineProps({
   profileId: {
@@ -20,14 +18,12 @@ const store = useUserInfoStore();
 
 let currentUserId = ref('');
 let currentUserUsername = ref('');
-let currentUserName = ref('');
-let currentUserSurname = ref('');
-
 
 let userProfileId: string = props.profileId;
 let userProfileUsername = ref('');
 let userProfileName = ref('');
 let userProfileSurname = ref('');
+let userProfileFactchecker = ref(false);
 
 const posts = ref<any[]>([]);
 
@@ -37,21 +33,20 @@ const fetchInfos = async (userId: string) => {
     userProfileUsername.value = JSON.stringify(response.data.userData.username).replace(/"/g, '');
     userProfileName.value = JSON.stringify(response.data.userData.name).replace(/"/g, '');
     userProfileSurname.value = JSON.stringify(response.data.userData.surname).replace(/"/g, '');
-    posts.value.push(response.data);
+    userProfileFactchecker.value = (JSON.stringify(response.data.userData.factChecker) == "true")
+    posts.value = (JSON.parse(JSON.stringify(response.data.lastPosts)));
   } catch (error) {
     console.error(error);
   }
-  console.log(posts);
+  console.log((posts));
 };
 
-onMounted( () => {
+onMounted( async () => {
     //retrieve session information
     const userInfo = computed(()=>store.getUserInfo).value;
     currentUserId.value = userInfo._id!;
     currentUserUsername.value = userInfo.username!;
-    currentUserName.value = userInfo.name!;
-    currentUserSurname.value = userInfo.surname!;
-    fetchInfos(userProfileId);
+    await fetchInfos(userProfileId);
 });
 
 async function buttonTrustUser() {
@@ -79,20 +74,12 @@ async function buttonUnTrustUser() {
 }
 
 async function trustUser(){
-  await store.trustUser({user: currentUserId.value, otherUserId: props.profileId});
+  await axios.post('/user/trustUser', {user: currentUserId.value, otherUserId: props.profileId});
 }
 
 async function unTrustUser(){
-  await store.unTrustUser({user: currentUserId.value, otherUserId: props.profileId});
+  await axios.post('/user/untrustUser', {user: currentUserId.value, otherUserId: props.profileId});
 }
-// async function ClearTrustUser(){
-//   await tokenstore.register({name: name.value, surname: surname.value, username: username.value, mail: email.value, password: password.value})
-//   window.location.href = '/login'
-// }
-// async function ClearUntrustUser(){
-//   await tokenstore.register({name: name.value, surname: surname.value, username: username.value, mail: email.value, password: password.value})
-//   window.location.href = '/login'
-// }
 
 </script>
 
@@ -101,16 +88,20 @@ async function unTrustUser(){
 </style>
 
 <template>
+  <AppHeader></AppHeader>
+  
   <div class="content">
-    <bandeau :username="currentUserUsername" :firstname="currentUserName" :lastname="currentUserSurname" />
     <div class="user-profile-container">
       <div class="user-profile-infos">
-        <ul class="info-list">
-          <li id="user-infos-id" class="label">{{ userProfileId }}</li>
-          <li id="user-infos-username" class="label">{{ userProfileUsername }}</li>
-          <li id="user-infos-name" class="label">{{ userProfileName }}</li>
-          <li id="user-infos-surname" class="label">{{ userProfileSurname }}</li>
-        </ul>
+        <strong>
+          <span id="userIdentity" class="label">{{ userProfileName }} {{ userProfileSurname }}</span>
+        </strong>
+        <em>
+          <span id="username">@{{ userProfileUsername }}</span>
+          <span v-if=userProfileFactchecker class="material-symbols-outlined factCheckerTick">
+            security
+          </span>
+        </em>
       </div>
       <div class="user-profile-buttons">
         <button class="material-symbols-outlined button-profile trust" @click="buttonTrustUser">
@@ -121,27 +112,36 @@ async function unTrustUser(){
         </button>
       </div>
     </div>
-    <feed :posts="posts" class="posts"></feed>
+    <feed :posts="posts" :isFactChecker="userProfileFactchecker" class="posts"></feed>
   </div>
 </template>
 
 <style scoped>
+  .content {
+    padding-top: 70px;
+  }
+
   .user-profile-container {
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
+    justify-content: space-evenly;
     align-items: flex-start;
     background-image: linear-gradient(to bottom, #f7e1e1 50%, #B9ABAB 100%);
   }
 
   .user-profile-infos {
-    flex: 1; 
+    display:flex;
+    flex-direction: column;
+    align-items:flex-start;
   }
+ 
 
   .user-profile-buttons {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
   }
+  
 
   .button-profile {
     background-color: transparent;
@@ -166,13 +166,55 @@ async function unTrustUser(){
     color: rgb(228, 37, 37);
   }
 
-  .info-list {
-    -moz-column-count: 2;
-    -moz-column-gap: 2vw;
-    -webkit-column-count: 2;
-    -webkit-column-gap: 2vw;
-    column-count: 2;
-    column-gap: 2vw;
-    list-style-type: none;
+  .factCheckerTick {
+    font-size: 15px;
+    margin-left: 5px;
+  }
+  
+  .factCheckerTick:hover:after {
+    display: block;
+    content: "This user is a fact checker";
+    position: absolute;
+    background: #f8f8f8;
+    border-right: 5px solid #dfdfdf;
+    border-bottom: 5px solid #dfdfdf;
+    border-top: 5px solid #dfdfdf;
+    border-left: 5px solid #dfdfdf;
+    padding: 5px;
+    width: auto;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .trust:hover:after {
+    color: black;
+    display: block;
+    content: "Trust user";
+    position: absolute;
+    background: #f8f8f8;
+    border-right: 5px solid #dfdfdf;
+    border-bottom: 5px solid #dfdfdf;
+    border-top: 5px solid #dfdfdf;
+    border-left: 5px solid #dfdfdf;
+    padding: 5px;
+    width: auto;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .untrust:hover:after {
+    color: black;
+    display: block;
+    content: "Untrust user";
+    position: absolute;
+    background: #f8f8f8;
+    border-right: 5px solid #dfdfdf;
+    border-bottom: 5px solid #dfdfdf;
+    border-top: 5px solid #dfdfdf;
+    border-left: 5px solid #dfdfdf;
+    padding: 5px;
+    width: auto;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
   }
 </style>
