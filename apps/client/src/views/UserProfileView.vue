@@ -19,6 +19,7 @@ const store = useUserInfoStore();
 
 let currentUserId = ref('');
 let currentUserUsername = ref('');
+let currentUserIsFactChecker = ref()
 
 let userProfileId: string = props.profileId;
 let userProfileUsername = ref('');
@@ -47,6 +48,7 @@ onMounted( async () => {
     const userInfo = computed(()=>store.getUserInfo).value;
     currentUserId.value = userInfo._id!;
     currentUserUsername.value = userInfo.username!;
+    currentUserIsFactChecker.value = (userInfo.isFactChecker === "true") ;
     await fetchInfos(userProfileId);
 });
 
@@ -113,30 +115,6 @@ async function unTrustUser(){
 
       <feed :posts="posts" :isFactChecker="userProfileFactchecker" class="feed"></feed>
     </div>
-    <!-- <div class="content">
-      <div class="user-profile-container">
-        <div class="user-profile-infos">
-          <strong>
-            <span id="userIdentity" class="label">{{ userProfileName }} {{ userProfileSurname }}</span>
-          </strong>
-          <em>
-            <span id="username">@{{ userProfileUsername }}</span>
-            <span v-if=userProfileFactchecker class="material-symbols-outlined factCheckerTick">
-              security
-            </span>
-          </em>
-        </div>
-        <div class="user-profile-buttons">
-          <button class="material-symbols-outlined button-profile trust" @click="buttonTrustUser">
-            verified_user
-          </button>
-          <button class="material-symbols-outlined button-profile untrust" @click="buttonUnTrustUser">
-            remove_moderator
-          </button>
-        </div>
-      </div>
-      <feed :posts="posts" :isFactChecker="userProfileFactchecker" class="posts"></feed>
-    </div> -->
   </AppLayout>
 </template>
 

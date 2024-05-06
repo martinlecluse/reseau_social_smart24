@@ -50,7 +50,7 @@ onMounted( async () => {
     gap: 1rem;
     overflow:auto;
     height:50vh;
-    width: 70%;
+    width: 100%;
 }
 .comments-content {
     display: flex;
