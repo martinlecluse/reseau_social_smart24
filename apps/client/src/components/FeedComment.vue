@@ -11,10 +11,12 @@ const props = defineProps([
 const comments = ref();
 let commentText = defineModel('commentText');
 
+const emits = defineEmits(['comment-sent']);
 const loadComments = ref(false);
 
 async function sendComment() {
     const resp = (await axios.post('/posts/comment', { text : commentText.value, parentPostId : props.parentPostId}));
+    emits('comment-sent');
     console.log(resp);
 }
 
