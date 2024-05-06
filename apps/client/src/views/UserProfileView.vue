@@ -4,7 +4,7 @@ import AppHeader from "@/components/common/AppHeader.vue";
 import feed from "../components/common/feed.vue"
 import '../assets/main.css'
 import { useUserInfoStore } from "../stores/userInfo";
-import { computed, onMounted, ref, defineProps } from "vue";
+import { computed, onMounted, ref, defineProps, watchEffect } from "vue";
 import axios from 'axios'
 import AppLayout from "@/components/common/AppLayout.vue";
 
@@ -37,6 +37,15 @@ const fetchInfos = async (userId: string) => {
     userProfileSurname.value = JSON.stringify(response.data.userData.surname).replace(/"/g, '');
     userProfileFactchecker.value = (JSON.stringify(response.data.userData.factChecker) == "true")
     posts.value = (JSON.parse(JSON.stringify(response.data.lastPosts)));
+
+    const otherResponse = await axios.get(`user/${currentUserId.value}/profile`)
+    if(JSON.stringify(otherResponse.data.userData.trustedUsers).includes(userProfileId)){
+      let trusted = document.getElementsByClassName('trust');
+      trusted[0].setAttribute('id', 'trusted');
+    } else if(JSON.stringify(otherResponse.data.userData.untrustedUsers).includes(userProfileId)){
+      let unTrusted = document.getElementsByClassName('untrust');
+      unTrusted[0].setAttribute('id', 'unTrusted');
+    }
   } catch (error) {
     console.error(error);
   }
@@ -84,6 +93,10 @@ async function unTrustUser(){
   await axios.post('/user/untrustUser', {user: currentUserId.value, otherUserId: props.profileId});
 }
 
+watchEffect(async () => {
+  userProfileId = props.profileId;
+  await fetchInfos(userProfileId);
+});
 </script>
 
 <style>
@@ -98,22 +111,27 @@ async function unTrustUser(){
       <div class="user-profile-container">
         <div class="user-profile-info">
           <p class="user-profile-name">{{ userProfileName }} {{ userProfileSurname }}</p>
-          <p class="user-profile-username">@{{ userProfileUsername }}</p>
+          <em class="column">
+            <p class="user-profile-username">@{{ userProfileUsername }} 
+              <span v-if="userProfileFactchecker" class="material-symbols-outlined factCheckerTick">security</span>
+            </p>
+          </em>
+            
         </div>
 
         <div class="user-profile-buttons">
             <div class="post-btn-grp">
-                <button class="post-btn" @click="buttonTrustUser">
+                <button class="post-btn trust" @click="buttonTrustUser">
                     <span class="post-btn-icon material-symbols-outlined">verified_user</span>
                 </button>
-                <button class="post-btn" @click="buttonUnTrustUser">
+                <button class="post-btn untrust" @click="buttonUnTrustUser">
                     <span class="post-btn-icon material-symbols-outlined">remove_moderator</span>
                 </button>
             </div>
         </div>
       </div>
 
-      <feed :posts="posts" :isFactChecker="userProfileFactchecker" class="feed"></feed>
+      <feed :posts="posts" :isFactChecker="currentUserIsFactChecker" class="feed"></feed>
     </div>
   </AppLayout>
 </template>
@@ -147,6 +165,35 @@ h1, h2, h3, h4, h5, h6, p {
   font-size: 1.2em;
   font-weight: 700;
   opacity: 0.75;
+}
+
+#trusted {
+  color: rgb(39, 39, 195);
+}
+
+#unTrusted {
+  color: rgb(228, 37, 37);
+}
+.column{
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+
+}
+
+.factCheckerTick:hover:after {
+  display: block;
+  content: "This user is a fact checker";
+  position: absolute;
+  background: #f8f8f8;
+  border-right: 5px solid #dfdfdf;
+  border-bottom: 5px solid #dfdfdf;
+  border-top: 5px solid #dfdfdf;
+  border-left: 5px solid #dfdfdf;
+  padding: 5px;
+  width: auto;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
   /* .content {
@@ -203,50 +250,7 @@ h1, h2, h3, h4, h5, h6, p {
     margin-left: 5px;
   }
   
-  .factCheckerTick:hover:after {
-    display: block;
-    content: "This user is a fact checker";
-    position: absolute;
-    background: #f8f8f8;
-    border-right: 5px solid #dfdfdf;
-    border-bottom: 5px solid #dfdfdf;
-    border-top: 5px solid #dfdfdf;
-    border-left: 5px solid #dfdfdf;
-    padding: 5px;
-    width: auto;
-    font-size: 14px;
-    font-family: Arial, Helvetica, sans-serif;
-  }
+  
 
-  .trust:hover:after {
-    color: black;
-    display: block;
-    content: "Trust user";
-    position: absolute;
-    background: #f8f8f8;
-    border-right: 5px solid #dfdfdf;
-    border-bottom: 5px solid #dfdfdf;
-    border-top: 5px solid #dfdfdf;
-    border-left: 5px solid #dfdfdf;
-    padding: 5px;
-    width: auto;
-    font-size: 14px;
-    font-family: Arial, Helvetica, sans-serif;
-  }
-
-  .untrust:hover:after {
-    color: black;
-    display: block;
-    content: "Untrust user";
-    position: absolute;
-    background: #f8f8f8;
-    border-right: 5px solid #dfdfdf;
-    border-bottom: 5px solid #dfdfdf;
-    border-top: 5px solid #dfdfdf;
-    border-left: 5px solid #dfdfdf;
-    padding: 5px;
-    width: auto;
-    font-size: 14px;
-    font-family: Arial, Helvetica, sans-serif;
-  } */
+   */
 </style>

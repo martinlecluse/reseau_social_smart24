@@ -36,72 +36,49 @@ onMounted( async () => {
     factChecks.value = (await axios.get(`/posts/${props.parentPostId}/factChecks`)).data;
     loadFactChecks.value = true;
     console.log(factChecks.value);
-})
+});
 
 </script>
 
 <template>
-    <div class="comments">
+    <div class="form-container">
         <div v-if="loadFactChecks" class="comments-content">
             <div v-for="factCheck in factChecks" :key="factCheck._id" class="comment">
                 <FactCheck :factCheck="factCheck"></FactCheck>
             </div>
         </div>
-        <div class="comment-form" v-if="props.userIsFactChecker">
-            <div>
-                <input v-model="grade" type="range" id="grade" name="grade" min="0" max="2" step="1" />
-                <label for="grade">Grade</label>
+        <div class="form" v-if="props.userIsFactChecker">
+            <div class="factchecker-container">
+                <div class="factchecker">
+                    <label for="grade">{{ grade==0? "false": grade==1? "cautious": "accurate"}}</label>
+                    <input v-model="grade" type="range" id="grade" name="grade" min="0" max="2" step="1" class= "[(grade==0)? 'false': (grade==1)? 'cautious': 'accurate']"/>
+                </div>
             </div>
-            <textarea v-model="message" class="comment-input" placeholder="Write your fact check message here..."></textarea>
-            <button @click="postMessage" class="comment-button">Create Fact Check</button>
+            <textarea v-model="message" class="input" placeholder="Write your fact check message here..."></textarea>
+            <button @click="postMessage" class="button">Create Fact Check</button>
             <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
         </div>
     </div>
 </template>
 
 <style scoped>
-.comments {
+.factchecker-container{
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    
-    width: 70%;
+  justify-content: flex-end;
+  align-items: center;
 }
-.comments-content {
+.factchecker{
     display: flex;
-    flex-direction: column;
-    overflow:auto;
-    height:50vh;
-    gap: 1rem;
+    justify-content: space-around;
+    width: 19vw;
+}
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
 }
 
-.comment-form{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 1rem;
-    width: 100%;
-}
-.comment-input{
-    border: none;
-    width: 100%;
-    height: 10vh;
 
-    padding : 1em;
-
-    background: #d9d9d9;
-    border-radius: 0.5rem;
-}
-
-.comment-button{
-    background: #242323;
-    color: white;
-
-    width: 20%;
-    height: 10%;
-    padding: 1rem;
-    border-radius: 1rem;
-    cursor: pointer;
-}
 </style>
+ 

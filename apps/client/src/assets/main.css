@@ -47,6 +47,36 @@ body {
   font-style: italic;
 }
 
+.button{
+  border: none;
+  background: #242323;
+  color: white;
+  padding: 0.5rem 2.5rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  align-self: flex-end;
+  display: flex;
+  justify-content: center;
+  align-self: center;
+
+}
+
+textarea{
+  background: #d9d9d9;
+  border-radius: 1rem;
+  padding: 1rem;
+  border:none;
+  width: 80%;
+  height:max-content;
+}
+
+.right-box{
+  display: flex;
+}
+
+.creator-username{
+  font-weight: 600;
+}
 .div-h1{
   font-size: 5rem;
   font-weight: 700;
@@ -60,6 +90,12 @@ body {
 
 
 /* ===== */
+
+.date {
+  margin: 0;
+  font-size: 0.85em;
+  opacity: 0.65;
+}
 
 .post-btn {
   display: flex;
@@ -135,4 +171,45 @@ body {
 .post-btn-grp .post-btn:not(:last-child) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  overflow:auto;
+  max-height:50vh;
+  width: 70%;
+  margin-bottom: 5vh;
+}
+
+
+.form{
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+
+}
+
+.input{
+  display:flex;
+  justify-content: center;
+  width: 100%;
+}
+
+                        /***** Track Styles *****/
+/***** Chrome, Safari, Opera, and Edge Chromium *****/
+input[type="range"]::-webkit-slider-runnable-track {
+  background: #053a5f;
+  height: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+/******** Firefox ********/
+input[type="range"]::-moz-range-track{
+  background: #053a5f;
+  height: 0.5rem;
+  border-radius: 0.5rem;
 }
