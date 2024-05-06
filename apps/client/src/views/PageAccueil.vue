@@ -53,7 +53,9 @@ onMounted(async () => {
 
 <template>
     <AppLayout>
-        <feed v-if="loadFeed" :posts="posts" :isFactChecker="userIsFactChecker"></feed>
+        <div v-if="loadFeed" class="content">
+            <feed :posts="posts" :isFactChecker="userIsFactChecker"></feed>
+        </div>
         <div v-else class="loading-container">
             <div class="spinner-border" role="status">
                 <span class="sr-only">Loading...</span>
@@ -72,15 +74,6 @@ onMounted(async () => {
 
 .mainFeed {
     padding-top: 70px;
-}
-
-main {
-    margin: 0 auto;
-    padding: 24px 12px;
-    max-width: 900px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
 }
 
 .create-post-btn {
