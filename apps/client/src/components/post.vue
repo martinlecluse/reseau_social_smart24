@@ -33,6 +33,7 @@ let factCheckOne= ref(0);
 let factCheckTwo= ref(0);
 
 
+
 const dateInstance = new Date(props.info.date);
 
 const showFactChecks = ref(false);
@@ -131,49 +132,51 @@ function checkIfUserHasLiked(list) {
 
 function getProportionFactCheck(){
 
-    console.log("length",props.info.metrics.factChecks);
     let nbFactChecks = props.info.metrics.factChecks.length;
 
     for(let i=0 ; i<nbFactChecks ; i++){
         if(props.info.metrics.factChecks[i].grade==0){
-            console.log("ok0");
             factCheckZero.value=factCheckZero.value+1;
         }else if(props.info.metrics.factChecks[i].grade==1){
             factCheckOne.value=factCheckOne.value+1;
-            console.log("ok1");
 
         }else if(props.info.metrics.factChecks[i].grade==2){
             factCheckTwo.value=factCheckTwo.value+1;
-            console.log("ok2");
 
         }
     }
 
-    factCheckZero.value= factCheckZero.value/nbFactChecks;
-    factCheckOne.value= factCheckOne.value/nbFactChecks;
-    factCheckTwo.value= factCheckTwo.value/nbFactChecks;
-
+    if(nbFactChecks!=0){
+        factCheckZero.value= factCheckZero.value/nbFactChecks*100;
+        factCheckOne.value= factCheckOne.value/nbFactChecks*100;
+        factCheckTwo.value= factCheckTwo.value/nbFactChecks*100;
+    }
+    
 }
 
 function modifDiagram(){
     getProportionFactCheck();
     // Récupérer l'élément de la barre de progression
-    var progressBar = document.getElementById("progressBar");
+    var progressBar = document.getElementById(props.info._id);
+    console.log(progressBar);
     // Définir le dégradé conique en fonction de la valeur de factCheckScore
-    console.log("factChechZero",factCheckZero.value);
-    console.log("factChechOne",factCheckOne.value);
-    console.log("factChechTwo",factCheckTwo.value);
-    progressBar.style.background = "conic-gradient(#green 0% "+ factCheckTwo+"% , #4caf50 " + factCheckTwo + "% "+ factCheckOne +"%, #f2f2f2 " + factCheckOne + "% "+factCheckZero+"%)";
+   
+    let myList=[factCheckZero.value,factCheckOne.value,factCheckTwo.value];
+
+    myList.sort((a, b) => a - b);
+
+    console.log("nbFactChecks",metric.value.nbFactChecks);
+console.log("id = ",props.info._id);
+    if(factCheckOne==0 && factCheckTwo==0 && factCheckZero==0){
+        progressBar.style.backgroundColor = "gray";
+    }else{
+        progressBar.style.background = `conic-gradient(orange 0% ${myList[0]}% , gray ${myList[0]}% ${myList[0]+myList[1]}%, green ${myList[0]+myList[1]}% ${myList[0]+myList[1]+myList[2]}%)`;
+    }
+
 
 }
 
 
-
-<<<<<<< HEAD
-=======
-// Définir le dégradé conique en fonction de la valeur de factCheckScore
-// progressBar.style.background = "conic-gradient(#green 0deg , #4caf50 " + factCheckScore + "%, #f2f2f2 " + factCheckScore + "%)";
->>>>>>> 929daa9158de723db27f8c36878272b8c1b2a156
 
 
 </script>
@@ -194,7 +197,7 @@ function modifDiagram(){
             </div>
             <div class="post-footer">
                 <div class="post-footer-left"> 
-                    <div v-if="props.userIsFactChecker" class="comment-icon-container">  
+                    <div v-if="props.userIsFactChecker" class="comment-icon-container post-btn-grp">  
                         <button class="post-btn" @click="switchShowFactChecks">
                             <span class="post-btn-icon material-symbols-outlined">verified</span>
                             <span class="post-btn-count">{{metric.nbFactChecks}}</span>
@@ -248,13 +251,12 @@ function modifDiagram(){
                         </button>
                     </div>
 
-<<<<<<< HEAD
-                    <div id="progressBar" class="progress-bar">
-=======
-                    <div id=progressBar class="progress-bar" @click="switchShowFactChecks">
->>>>>>> 929daa9158de723db27f8c36878272b8c1b2a156
-                        <div id="progress">{{metric.factCheckScore}}</div>
-                    </div>
+                    <div class="post-btn-grp">
+                        <div v-if="props.info.metrics.nbFactChecks!=0" v-bind:id=props.info._id class="progress-bar" @click="switchShowFactChecks">
+                            <div id="progress">{{metric.factCheckScore}}</div>
+                        </div>
+                     </div>
+
 
                 </div>
 
@@ -307,9 +309,9 @@ h1, h2, h3, h4, h5, h6, p {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left:23vh;
   width: 5vh;
   height: 5vh;
+  margin-left: 10vh;
   border-radius: 50%;
   color:black;
   font-size: 1.3rem;
