@@ -30,7 +30,6 @@ const handleNewPostStatus = (status: string) => {
     }
 }
 
-
 onMounted(async () => {
     let userInfo = store.getUserInfo;
 

@@ -32,7 +32,7 @@ let factCheckZero= ref(0);
 let factCheckOne= ref(0);
 let factCheckTwo= ref(0);
 
-
+const computedFactCheckScore = ref();
 
 const dateInstance = new Date(props.info.date);
 
@@ -133,8 +133,8 @@ function checkIfUserHasLiked(list) {
 
 async function getProportionFactCheck(){
 
-    let nbFactChecks = props.info.metrics.factChecks.length;
     let factChecks = (await axios.get(`/posts/${props.info._id}/factChecks`)).data;
+    let nbFactChecks = factChecks.length;
     factCheckZero.value=0;
     factCheckOne.value=0;
     factCheckTwo.value=0;
@@ -154,7 +154,10 @@ async function getProportionFactCheck(){
         factCheckOne.value= factCheckOne.value/nbFactChecks*100;
         factCheckTwo.value= factCheckTwo.value/nbFactChecks*100;
     }
-    
+
+    computedFactCheckScore.value = (factCheckOne.value + 2*factCheckTwo.value)/(factCheckOne.value+factCheckZero.value+factCheckTwo.value);
+    computedFactCheckScore.value = Math.round(computedFactCheckScore.value*10)/2;
+
 }
 
 async function modifDiagram(){
@@ -240,13 +243,10 @@ async function modifDiagram(){
                         </button>
                     </div>
 
-                    <div v-if="metric.nbFactChecks!=0" class="post-btn-grp">
-                        <div v-bind:id=props.info._id class="progress-bar" @click="switchShowFactChecks">
-                            <div id="progress">{{metric.factCheckScore}}</div>
-                        </div>
-                     </div>
-
-
+                    <div v-if="metric.nbFactChecks!=0" class="factCheck-progress-diagram">
+                        <div v-bind:id=props.info._id class="progress-bar" @click="switchShowFactChecks"></div>
+                        <div id="progress">{{computedFactCheckScore}}</div>
+                    </div>
                 </div>
 
                 
@@ -318,7 +318,16 @@ h1, h2, h3, h4, h5, h6, p {
   animation: progress 2s 1 forwards;
 } */
 
+#progress {
+    font-weight: 700;
+    margin-left: 0.5em;
+}
 
+.factCheck-progress-diagram {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .post-content {
     font-size: 0.9em;

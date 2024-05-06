@@ -63,7 +63,7 @@ export class FactCheckService {
     async getFactChecksByPost(postId: NonStrictObjectId): Promise<(Document & IFactCheck)[]> {
         const factChecksQuery = FactCheck.find({ postId: postId })
             .sort({ date: -1 })
-            .populate('emittedBy', 'username _id');
+            .populate('emittedBy', 'username _id organization');
 
         const res = await factChecksQuery.exec();
         return res.length > 0 ? res : [];
