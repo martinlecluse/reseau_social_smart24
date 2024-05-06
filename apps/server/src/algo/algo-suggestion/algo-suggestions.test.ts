@@ -12,6 +12,7 @@ import { AlgoFieldComputer } from '../algo-field-computer';
 import { AlgoSimilar } from '../../models/algo/algo-similar';
 import { AlgoConfidence } from '../../models/algo/algo-confidence';
 import { IPost } from '../../models/post';
+import { UserService } from '../../services/user-service';
 
 const DEFAULT_USER_1 = {
     username: 'mikewards',
@@ -50,12 +51,18 @@ describe('AlgoSuggestionComputer', () => {
     beforeEach(() => {
         similarityComputer = new AlgoFieldComputer(AlgoSimilar, RatingsLikes, RatingsDislikes);
         confidenceComputer = new AlgoFieldComputer(AlgoConfidence, RatingsLikes, RatingsDislikes);
-        algoSuggestionComputer = new AlgoSuggestionDefaultComputer({
-            kTopUsers: 2,
-            selectUserType: 'similar',
-            positiveRatingsModel: RatingsLikes,
-            negativeRatingsModel: RatingsDislikes,
-        });
+        algoSuggestionComputer = new AlgoSuggestionDefaultComputer(
+            {
+                kTopUsers: 2,
+                selectUserType: 'similar',
+                positiveRatingsModel: RatingsLikes,
+                negativeRatingsModel: RatingsDislikes,
+                rateFactChecked: 0.25,
+                rateDiversification: 0.75,
+            },
+            container.resolve(PostService),
+            container.resolve(UserService),
+        );
     });
 
     beforeEach(async () => {
