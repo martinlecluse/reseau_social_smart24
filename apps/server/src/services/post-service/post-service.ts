@@ -7,7 +7,7 @@ import { AlgoSuggestion, IAlgoParams, IAlgoSuggestionOther } from '../../models/
 import { Comment, CommentDocument, ICreateComment } from '../../models/comment';
 import { HttpException } from '../../models/http-exception';
 import { Metrics } from '../../models/metrics';
-import { ICreatePost, IPost, Post } from '../../models/post';
+import { ICreatePost, IPost, Post, IPostWithMetrics } from '../../models/post';
 import { NonStrictObjectId } from '../../utils/objectid';
 import { UserService } from '../user-service';
 
@@ -58,10 +58,10 @@ export class PostService {
         return comment;
     }
 
-    async getPost(postId: NonStrictObjectId): Promise<Document & IPost> {
-        const post = await Post.findOne({ _id: postId }).populate('createdBy', 'username _id').populate({
+    async getPost(postId: NonStrictObjectId): Promise<ItemForComputation> {
+        const post = await Post.findOne<ItemForComputation>({ _id: postId }).populate('createdBy', 'username _id').populate({
             path: 'metrics',
-            populate: { path: 'factChecks' } // Populate factChecks within metrics
+            populate: { path: 'factChecks' }, 
         });
 
         if (!post) {

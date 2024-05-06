@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-
+import { IMetrics } from './metrics';
 import { DateTime } from 'luxon';
 
 const options = { discriminatorKey: 'kind' };
@@ -17,6 +17,13 @@ export interface IPost extends ICreatePost {
     metrics: mongoose.Types.ObjectId;
 }
 
+export interface IPostWithMetrics extends ICreatePost {
+    text: string;
+    date: DateTime;
+    image: string;
+    createdBy: mongoose.Types.ObjectId;
+    metrics: IMetrics;
+}
 const PostSchema = new Schema<IPost>(
     {
         text: { type: String, required: true },
