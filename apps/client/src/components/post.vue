@@ -193,7 +193,13 @@ function checkIfUserHasLiked(list) {
                             <span class="post-btn-count">{{metric.nbComments}}</span>
                         </button>
                     </div>
+
+                    <div class="progress-bar">
+                        <progress value={{metric.factCheckScore}} min="0" max="100" style="visibility:hidden;height:0;width:0;">{{ metric.factCheckScore }}</progress>
+                    </div>
+
                 </div>
+
                 
                 <div class="post-footer-right">
                     <p class="post-creator-username">
@@ -237,6 +243,37 @@ h1, h2, h3, h4, h5, h6, p {
     flex-direction: column;
     gap: 24px;
 }
+
+@property --progress-value {
+  syntax: "<integer>";
+  initial-value: 0;
+  inherits: false;
+}
+
+@keyframes progress {
+ to { --progress-value: 40%; }
+}
+
+.progress-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left:16vh;
+  width: 5vh;
+  height: 5vh;
+  border-radius: 50%;
+  background: 
+    conic-gradient(green 40%, red 6);
+  animation: progress 2s 1 forwards;
+}
+
+.progress-bar::before {
+  counter-reset: var(--progress-value);
+  content: counter(percentage);
+  animation: progress 2s 1 forwards;
+}
+
+
 
 .post-content {
     font-size: 0.9em;

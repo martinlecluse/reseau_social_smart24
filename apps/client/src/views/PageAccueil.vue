@@ -39,7 +39,6 @@ onMounted(async () => {
     userIsFactChecker.value = userInfo.isFactChecker === "true" ? true : false;
 
     try {
-
         posts.value = (await axios.get('/posts/getSuggestions')).data.suggestions;
 
         console.log(posts.value)

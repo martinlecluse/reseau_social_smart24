@@ -69,9 +69,7 @@ onMounted( async () => {
     border: none;
     width: 100%;
     height: 10vh;
-
     padding : 1em;
-
     background: #d9d9d9;
     border-radius: 0.5rem;
 }
@@ -79,7 +77,6 @@ onMounted( async () => {
 .comment-button{
     background: #242323;
     color: white;
-
     width: 20%;
     height: 10%;
     padding: 1rem;
