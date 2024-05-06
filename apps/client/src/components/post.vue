@@ -52,6 +52,11 @@ const openCommentsPanel = () => {
     loadComments.value = true
 }
 
+const closeFeedComment = async () => {
+    loadComments.value = false;
+    metric.value = await getMetrics();
+}
+
 async function getMetrics() {
     const res = await axios.get(`/posts/${props.info._id}/metrics`);
     return res.data;
@@ -203,8 +208,7 @@ function checkIfUserHasLiked(list) {
         </div>
     </div>
     <div v-if="loadComments">
-        <modal><FeedComment :parentPostId="info._id"></FeedComment></modal>
-
+        <modal @close="closeFeedComment"><FeedComment :parentPostId="info._id" @comment-sent="closeFeedComment"></FeedComment></modal>
     </div>
     <div v-if="showFactChecks">
         <modal @close="switchShowFactChecks">
