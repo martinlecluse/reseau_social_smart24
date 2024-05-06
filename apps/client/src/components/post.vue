@@ -144,7 +144,7 @@ var progressBar = document.getElementById("progressBar");
 var progressElement = document.getElementById("progress");
 
 // Définir le dégradé conique en fonction de la valeur de factCheckScore
-progressBar.style.background = "conic-gradient(#green 0deg , #4caf50 " + factCheckScore + "%, #f2f2f2 " + factCheckScore + "%)";
+// progressBar.style.background = "conic-gradient(#green 0deg , #4caf50 " + factCheckScore + "%, #f2f2f2 " + factCheckScore + "%)";
 
 
 </script>
@@ -219,7 +219,7 @@ progressBar.style.background = "conic-gradient(#green 0deg , #4caf50 " + factChe
                         </button>
                     </div>
 
-                    <div id=progressBar class="progress-bar">
+                    <div id=progressBar class="progress-bar" @click="switchShowFactChecks">
                         <div id="progress">{{metric.factCheckScore}}</div>
                     </div>
 
@@ -228,7 +228,7 @@ progressBar.style.background = "conic-gradient(#green 0deg , #4caf50 " + factChe
                 
                 <div class="post-footer-right">
                     <p class="post-creator-username">
-                        <router-link :to="{ name: 'profile', params: { profileId: props.info.createdBy._id } }">
+                        <router-link v-if="props.info.createdBy && props.info.createdBy._id" :to="{ name: 'profile', params: { profileId: props.info.createdBy._id } }">
                             {{ props.info.createdBy.username }}
                         </router-link>
                     </p>
