@@ -58,3 +58,4 @@ export const User = mongoose.model<IUser>('User', UserSchema);
 
 // Export model
 export default User;
+

@@ -1,10 +1,11 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <!-- eslint-disable vue/require-v-for-key -->
-<script setup>
+<script setup lang="ts">
+import { defineProps } from 'vue';
 import post from '../post.vue'
 
 const props = defineProps({
-    posts: Array,
+    posts: Object,
     isFactChecker: Boolean
 })
 
@@ -20,7 +21,23 @@ const props = defineProps({
 
 <style scoped>
 
-.feed{
+.feed {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background-color: white;
+    border-radius: 12px;
+}
+
+.posts {
+    padding: 24px;
+}
+
+.posts:not(:last-child) {
+    border-bottom: solid 1px rgb(231, 231, 231);
+}
+
+/* .feed{
     width: 50%;
     height: 97%;
 
@@ -47,6 +64,6 @@ const props = defineProps({
     display: flex;
     flex-direction: column;
     justify-content: center;
-}
+} */
 
 </style>

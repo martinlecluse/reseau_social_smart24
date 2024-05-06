@@ -8,14 +8,23 @@ export const useTokenStore = defineStore({
     token: localStorage.getItem('token') || null
   }),
   actions: {
-    async login(credentials: { username: string, password: string }) {
-        const response = await axios.post('/login', credentials);
-            
-        const token = response.data.token
-        localStorage.setItem('token', token);
+      async login(credentials: { username: string, password: string }) {
 
-        return response;
-    },
+          try {
+	  
+	  const response = await axios.post('/login', credentials);
+            
+	  const token = response.data.token
+	  localStorage.setItem('token', token);
+
+	  return response;
+
+          }
+          catch (error) {
+	  return (error.response);
+          }
+          
+      },
     async loadSession() {
       const token = localStorage.getItem('token');
 
@@ -35,10 +44,18 @@ export const useTokenStore = defineStore({
     isLoggedIn(): boolean {
       return this.token !== null;
     },
-    async register(infos: { name: string, surname: string, username: string, mail: string, password: string }) {  //TODO: Should be moved out from tokenStore ?
-      const response = await axios.post('/signup', infos);
-      return response;
-    },
+      async register(infos: { name: string, surname: string, username: string, mail: string, password: string }) {  //TODO: Should be moved out from tokenStore ?
+
+          try {
+	  
+	  const response = await axios.post('/signup', infos);
+	  return response;
+
+          } catch(error) {
+	  return error.response;
+          }
+          
+      },
     logout() {
       this.token = null
       localStorage.removeItem('token');
