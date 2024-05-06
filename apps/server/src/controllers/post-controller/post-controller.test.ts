@@ -17,7 +17,7 @@ const DEFAULT_CREATE_POST: ICreatePost = {
 const DEFAULT_POST = {
     text: 'This is my post!!!',
     date: DateTime.now(),
-    metrics: new Types.ObjectId('123'),
+    metrics: new Types.ObjectId('123123123123123123123123'),
 };
 
 describe('PostController', () => {
