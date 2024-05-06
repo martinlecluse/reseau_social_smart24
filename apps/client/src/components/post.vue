@@ -261,8 +261,12 @@ function modifDiagram(){
                 
                 <div class="post-footer-right">
                     <p class="post-creator-username">
-                        <router-link v-if="props.info.createdBy && props.info.createdBy.username && props.info.createdBy._id" :to="{ name: 'profile', params: { profileId: props.info.createdBy._id } }">
+                        <router-link v-if="props.info.createdBy && (props.info.createdBy.username && props.info.createdBy._id)" :to="{ name: 'profile', params: { profileId: props.info.createdBy._id } }">
                             {{ props.info.createdBy.username }}
+                        </router-link>
+
+		<router-link v-if="props.info.createdBy[0] && (props.info.createdBy[0].username && props.info.createdBy[0]._id)" :to="{ name: 'profile', params: { profileId: props.info.createdBy[0]._id } }">
+                            {{ props.info.createdBy[0].username }}
                         </router-link>
                     </p>
                     <p class="post-date">{{ dateInstance.toLocaleString('fr-FR') }}</p>
