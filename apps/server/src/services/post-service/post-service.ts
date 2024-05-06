@@ -1,14 +1,15 @@
 import { StatusCodes } from 'http-status-codes';
+import { DateTime } from 'luxon';
 import { Document } from 'mongoose';
+import { ItemForComputation } from 'src/algo/algo-suggestion/algo-suggestions-computer';
 import { singleton } from 'tsyringe';
+import { AlgoSuggestion, IAlgoParams, IAlgoSuggestionOther } from '../../models/algo/algo-suggestion';
 import { Comment, CommentDocument, ICreateComment } from '../../models/comment';
 import { HttpException } from '../../models/http-exception';
 import { Metrics } from '../../models/metrics';
 import { ICreatePost, IPost, Post } from '../../models/post';
 import { NonStrictObjectId } from '../../utils/objectid';
 import { UserService } from '../user-service';
-import { AlgoSuggestion, IAlgoParams, IAlgoSuggestionOther } from '../../models/algo/algo-suggestion';
-import { ItemForComputation } from 'src/algo/algo-suggestion/algo-suggestions-computer';
 
 @singleton()
 export class PostService {
@@ -23,6 +24,7 @@ export class PostService {
         let post = new Post({
             text: newPost.text,
             image: newPost.image,
+            date: DateTime.now(),
             createdBy: userId,
             metrics: metrics._id,
         });
@@ -139,8 +141,10 @@ export class PostService {
             //fills missing posts with random posts
             const nbSuggToAdd = 200 - nbSuggestions;
 
-
-	          const suggestionsToAdd = await Post.find({ _id: { $nin: suggestions } }).populate('createdBy', 'username _id').populate('metrics').limit(nbSuggToAdd);
+            const suggestionsToAdd = await Post.find({ _id: { $nin: suggestions } })
+                .populate('createdBy', 'username _id')
+                .populate('metrics')
+                .limit(nbSuggToAdd);
 
             const factCheckPipeline = [
                 {

@@ -13,7 +13,7 @@ const props = defineProps([
         </a>
     </div> -->
     <router-link to="/homepage" class="logo laila" :style="{fontSize: props.size}">
-        A
+        H
     </router-link>
 </template>
 
