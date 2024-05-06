@@ -5,7 +5,6 @@ import { onMounted } from 'vue';
 import  { useUserInfoStore } from '../stores/userInfo'
 import  { ref } from 'vue'
 import { useTokenStore } from '../stores/auth'
-import { authHeader } from "@/utils/auth";
 import { computed } from "vue";
 import AppHeader from "@/components/common/AppHeader.vue";
 
@@ -19,30 +18,29 @@ const token = ref('');
 const userId = ref('');
 const userData = ref('');
 
+const changed = ref(false);
+const savedMessage = ref('');
 const newFactCheckedRate = ref('');
 const newDiversityRate = ref('');
 
-function switchSelectedValue(event) {
-  let siblings = event.target.parentNode.childNodes
-  siblings.forEach(s => {
-    s.setAttribute('id', 'not-selected')
-  });
-  event.target.setAttribute('id', 'selected');
-}
-
-function updateFactCheckRate(value, event) {
-    newFactCheckedRate.value = value;
-    switchSelectedValue(event)
-}
-
-function updateDiversityRate(value, event) {
-    newDiversityRate.value = value;
-    switchSelectedValue(event)
-}
-
 async function updateUserParams() {
+    savedMessage.value = 'Saving...';
     let updatedInfo = { parameters : { rateFactChecked: newFactCheckedRate.value, rateDiversification: newDiversityRate.value}};
     userData.value = (await axios.post('/user/update', updatedInfo)).data;
+    changed.value = false;
+    savedMessage.value = 'Settings saved !';
+}
+
+function handleFactCheckRateChange(event) {
+    newFactCheckedRate.value = event.target.value;
+    changed.value = true;
+    savedMessage.value = '';
+}
+
+function handleDiversityRateChange(event) {
+    newDiversityRate.value = event.target.value;
+    changed.value = true;
+    savedMessage.value = '';
 }
 
 onMounted(async () => {
@@ -64,8 +62,59 @@ onMounted(async () => {
 <template>
     <AppHeader></AppHeader>
 
-    <div class="content">
-        <div v-if="loaded" class="panel profile">
+    <div class="content" v-if="loaded">
+        <section>
+            <h1 class="section-title">Profile</h1>
+
+            <div class="subsection">
+                <h2 class="subsection-title">Personal information</h2>
+                
+                <div class="field">
+                    <p class="field-title">Name</p>
+                    <input class="field-content" disabled :value="userData.name + ' ' + userData.surname" />
+                </div>
+                <div class="field">
+                    <p class="field-title">Email</p>
+                    <input class="field-content" disabled :value="userData.mail" />
+                </div>
+                <div class="field" v-if="userData.factChecker">
+                    <p class="field-title">Organization</p>
+                    <input class="field-content" disabled :value="userData.organization" />
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h1 class="section-title">Settings</h1>
+
+            <p class="std text">Here, you can choose the way you want the public feed to look like</p>
+            <div class="subsection">
+                <h2 class="subsection-title">Feed</h2>
+
+                <div>
+                    <div class="field">
+                        <p class="field-title">Fact-checking <span class="field-value">{{newFactCheckedRate}} %</span></p>
+                        <input class="field-content" type="range" min="0" max="100" step="10" :value="newFactCheckedRate" @change="handleFactCheckRateChange" @input="handleFactCheckRateChange" />
+                    </div>
+                    <p class="field-info">Set the rate of fact-checked posts in your feed</p>
+                </div>
+                <div>
+                    <div class="field">
+                        <p class="field-title">Diversity <span class="field-value">{{newDiversityRate}} %</span></p>
+                        <input class="field-content" type="range" min="0" max="100" step="10" :value="newDiversityRate" @change="handleDiversityRateChange" @input="handleDiversityRateChange" />
+                    </div>
+                    <p class="field-info">Set the rate of posts that will be out of your current interest centers (sounds exciting !)</p>
+                </div>
+            </div>
+            
+            <div class="submit">
+                <button class="btn btn-primary" @click="updateUserParams" :disabled="!changed">Save</button>
+                <p class="submit-message">{{ savedMessage }}</p>
+            </div>
+        </section>
+
+
+        <!-- <div v-if="loaded" class="panel profile">
             <div class="info">
                 <h1 class="std title1">Profile</h1>
                 <div class="section user-info">
@@ -126,69 +175,82 @@ onMounted(async () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 
 <style scoped>
 
-.content{
+h1, h2, h3, h4, h5, h6, p {
+    margin: 0;
+}
+
+.content {
+    padding-top: 70px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-
-    width: 100%;
-    padding-top: 70px;
+    gap: 24px;
+    padding: 94px 12px 24px 12px;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
-.info {
-    margin: 2em 2em 2em 2em;
-}
-
-.section {
-    margin: 1em 0 0 0.3em;
-}
-
-.section-content {
-    margin: 1em 0 0 0.3em;
-}
-
-.fact-checker-info {
-    margin: 1em 0 0 0;
-}
-
-.select-param {
-    margin: 1em 0 0 0;
-}
-
-.validate-button {
+section {
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.validate-button button {
-    margin: 0 3em 0 0;
-}
-
-.set-param {
+.subsection {
     display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-
-    margin: 0.5em 0 0.5em 0;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.select-param #not-selected.btn.btn-primary {
-  background-color: white;
-  color: black;
-  border: 1px solid black;
+.field {
+    display: flex;
+    gap: 12px;
 }
 
-.select-param #selected.btn.btn-primary {
-  background-color: blue;
-  color: white;
-  border: 1px solid blue;
+.field .field-title {
+    width: 33%;
+    max-width: 200px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.75);
+}
+
+.field > input {
+    flex-grow: 1;
+}
+
+.field-info {
+    font-size: 0.85em;
+    opacity: 0.75;
+    font-style: italic;
+}
+
+.field-value {
+    background-color: rgb(110, 110, 110);
+    color: white;
+    padding: 3px 8px;
+    font-size: 0.8em;
+    border-radius: 100px;
+    white-space: nowrap;
+}
+
+.submit {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.submit button {
+    width: 150px;
+}
+
+.submit-message {
+    font-size: 0.85em;
+    font-style: italic;
 }
 
 </style>
