@@ -126,7 +126,7 @@ async function unTrustUser(){
         </div>
       </div>
 
-      <feed :posts="posts" :isFactChecker="userProfileFactchecker" class="feed"></feed>
+      <feed :posts="posts" :isFactChecker="currentUserIsFactChecker" class="feed"></feed>
     </div>
   </AppLayout>
 </template>
