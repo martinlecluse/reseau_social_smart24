@@ -105,6 +105,5 @@ body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    background-image: linear-gradient(to bottom, #f7e1e1 50%, #B9ABAB 100%);
   }
   
