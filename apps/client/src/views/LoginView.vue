@@ -14,4 +14,15 @@ import '../assets/HomeView.css'
 </template>
 
 <style scoped>
+
+.main {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  gap: 24px;
+  padding: 24px;
+  justify-content: center;
+  align-items: center;
+}
+
 </style>

@@ -25,8 +25,6 @@ const props = defineProps({
     display: flex;
     flex-direction: column;
     gap: 12px;
-    background-color: white;
-    border-radius: 12px;
 }
 
 .posts {
@@ -36,34 +34,5 @@ const props = defineProps({
 .posts:not(:last-child) {
     border-bottom: solid 1px rgb(231, 231, 231);
 }
-
-/* .feed{
-    width: 50%;
-    height: 97%;
-
-    display:flex;
-    flex-direction: column;
-    align-items: center;
-
-    margin-top:2em;
-    margin-bottom: 2em;
-
-    border-radius:30px;
-
-    overflow-y:auto ;
-    padding: 6vh;
-    background-color:whitesmoke;
-}
-
-.posts{
-    width: 100%;
-    height: fit-content;
-
-    margin: 1em 0 1em 0;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-} */
 
 </style>

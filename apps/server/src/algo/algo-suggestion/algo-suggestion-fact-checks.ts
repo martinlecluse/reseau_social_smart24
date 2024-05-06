@@ -2,8 +2,12 @@ import { IAlgoFieldOther } from '../../models/algo/algo-field';
 import { ItemForComputation } from './algo-suggestions-computer';
 import { AlgoSuggestionConfidenceComputer, AlgoSuggestionConfidenceConfig } from './algo-suggestion-conf-computer';
 
-export class AlgoSuggestionReconfComputer<
-    Config extends AlgoSuggestionConfidenceConfig = AlgoSuggestionConfidenceConfig,
+export interface AlgoSuggestionFactChecksConfig extends AlgoSuggestionConfidenceConfig {
+    factCheckCoefficient: number;
+}
+
+export class AlgoSuggestionFactChecksComputer<
+    Config extends AlgoSuggestionFactChecksConfig = AlgoSuggestionFactChecksConfig,
 > extends AlgoSuggestionConfidenceComputer<Config> {
     protected computeWeightForItem(
         item: ItemForComputation,
@@ -14,6 +18,7 @@ export class AlgoSuggestionReconfComputer<
         let secondaryOther: IAlgoFieldOther | undefined;
         let primaryCoefficient: number;
         let secondaryCoefficient: number;
+        const factCheckCoefficient: number = this.config.factCheckCoefficient;
 
         if (this.config.selectUserType === 'confidence') {
             primaryOther = confidenceOther;
@@ -26,11 +31,19 @@ export class AlgoSuggestionReconfComputer<
             primaryCoefficient = this.config.similarityCoefficient;
             secondaryCoefficient = this.config.confidenceCoefficient;
         }
+        const nbFactChecks = item.metrics.nbFactChecks;
+        let factCheckScore: number = 0; //no fact-chceks => no impact
+
+        if (nbFactChecks > 0) {
+            factCheckScore = item.metrics.factCheckScore - 1.5; //below mean => degradation
+        }
 
         if (primaryOther) {
             if (secondaryOther) {
                 return (
-                    (primaryOther.score / primaryCoefficient + secondaryOther.score / secondaryCoefficient) /
+                    (primaryOther.score / primaryCoefficient +
+                        secondaryOther.score / secondaryCoefficient +
+                        factCheckScore / factCheckCoefficient) /
                     (primaryCoefficient + secondaryCoefficient)
                 );
             } else {

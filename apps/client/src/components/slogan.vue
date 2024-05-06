@@ -10,3 +10,15 @@
   </div> 
   
 </template>
+
+<style scoped>
+
+.slogan{
+    height:100vh;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+</style>

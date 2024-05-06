@@ -6,6 +6,7 @@ import '../assets/main.css'
 import { useUserInfoStore } from "../stores/userInfo";
 import { computed, onMounted, ref, defineProps } from "vue";
 import axios from 'axios'
+import AppLayout from "@/components/common/AppLayout.vue";
 
 const props = defineProps({
   profileId: {
@@ -90,53 +91,82 @@ async function unTrustUser(){
 </style>
 
 <template>
-  <AppHeader></AppHeader>
-  
-  <div class="content">
-    <div class="user-profile-container">
-      <div class="user-profile-infos">
-        <strong>
-          <span id="userIdentity" class="label">{{ userProfileName }} {{ userProfileSurname }}</span>
-        </strong>
-        <em>
-          <span id="username">@{{ userProfileUsername }}</span>
-          <span v-if=userProfileFactchecker class="material-symbols-outlined factCheckerTick">
-            security
-          </span>
-        </em>
+  <!-- <AppHeader></AppHeader> -->
+
+  <AppLayout>
+    <div class="content">
+      <div class="user-profile-container">
+        <div class="user-profile-info">
+          <p class="user-profile-name">{{ userProfileName }} {{ userProfileSurname }}</p>
+          <p class="user-profile-username">@{{ userProfileUsername }}</p>
+        </div>
+
+        <div class="user-profile-buttons">
+            <div class="post-btn-grp">
+                <button class="post-btn" @click="buttonTrustUser">
+                    <span class="post-btn-icon material-symbols-outlined">verified_user</span>
+                </button>
+                <button class="post-btn" @click="buttonUnTrustUser">
+                    <span class="post-btn-icon material-symbols-outlined">remove_moderator</span>
+                </button>
+            </div>
+        </div>
       </div>
-      <div class="user-profile-buttons">
-        <button class="material-symbols-outlined button-profile trust" @click="buttonTrustUser">
-          verified_user
-        </button>
-        <button class="material-symbols-outlined button-profile untrust" @click="buttonUnTrustUser">
-          remove_moderator
-        </button>
-      </div>
+
+      <feed :posts="posts" :isFactChecker="userProfileFactchecker" class="feed"></feed>
     </div>
-    <feed :posts="posts" :isFactChecker="currentUserIsFactChecker" class="posts"></feed>
-  </div>
+  </AppLayout>
 </template>
 
 <style scoped>
-  .content {
+
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+}
+
+.user-profile-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: solid 1px rgb(231, 231, 231);
+}
+
+.user-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-profile-name {
+  font-size: 2.2em;
+  font-weight: 600;
+}
+
+.user-profile-username {
+  font-size: 1.2em;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+  /* .content {
     padding-top: 70px;
   }
 
   .user-profile-container {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
     align-items: flex-start;
-    background-image: linear-gradient(to bottom, #f7e1e1 50%, #B9ABAB 100%);
   }
 
   .user-profile-infos {
     display:flex;
     flex-direction: column;
-    align-items:flex-start;
   }
  
+  #userIdentity {
+    font-size: 2em;
+  }
 
   .user-profile-buttons {
     display: flex;
@@ -218,5 +248,5 @@ async function unTrustUser(){
     width: auto;
     font-size: 14px;
     font-family: Arial, Helvetica, sans-serif;
-  }
+  } */
 </style>

@@ -4,7 +4,7 @@ import feed from "../components/common/feed.vue"
 import { useUserInfoStore } from "../stores/userInfo";
 import axios from "axios";
 import { onMounted, ref } from "vue";
-import AppHeader from "@/components/common/AppHeader.vue";
+import AppLayout from "@/components/common/AppLayout.vue";
 import modal from "@/components/pop-ups/modal.vue";
 import NewPost from "@/components/NewPost.vue";
 
@@ -52,19 +52,18 @@ onMounted(async () => {
 </script>
 
 <template>
-    <AppHeader></AppHeader>
-
-    <div class="mainFeed">
-        <main>
-            <div class="options">
-                <button class="btn btn-primary b" @click="switchShowCreateNewPost">
-                    Create a new post
-                </button>
+    <AppLayout>
+        <div v-if="loadFeed" class="content">
+            <feed :posts="posts" :isFactChecker="userIsFactChecker"></feed>
+        </div>
+        <div v-else class="loading-container">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
             </div>
+        </div>
+    </AppLayout>
 
-            <feed v-if="loadFeed" :posts="posts" :isFactChecker="userIsFactChecker"></feed>
-        </main>
-    </div>
+    <button class="btn btn-primary b create-post-btn" @click="switchShowCreateNewPost">Create a new post</button>
 
     <modal v-if="showCreateNewPost" @close="switchShowCreateNewPost">
         <NewPost @postStatus="handleNewPostStatus"/>
@@ -73,30 +72,21 @@ onMounted(async () => {
 
 <style scoped>
 
-.mainFeed{
-    width:100%;
-    height:100vh;
+.mainFeed {
     padding-top: 70px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow: auto;
-    background-image: linear-gradient(to bottom, #f7e1e1 50%, #B9ABAB 100%);
 }
 
-main {
-    margin: 0 auto;
-    padding: 24px 12px;
-    max-width: 900px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+.create-post-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.options {
+.loading-container {
+    padding: 12px;
     display: flex;
-    gap: 6px;
-    justify-content: flex-end;
+    justify-content: center;
 }
 
 </style>
