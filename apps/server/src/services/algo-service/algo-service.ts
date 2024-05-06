@@ -141,6 +141,8 @@ export class AlgoService {
     ): Promise<PromiseRejectedResult[]> {
         logger.info(this.constructor.name, 'computeForUser', 'Computing for', user);
 
+        console.log(suggestionType);
+
         const result = await Promise.allSettled([
             this.similarityComputer.computeForUser(user),
             this.confidenceComputer.computeForUser(user),
