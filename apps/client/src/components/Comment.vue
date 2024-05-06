@@ -1,11 +1,20 @@
 <script setup>
 import { ref } from "vue";
 
-const props = defineProps([
-    'comment'
-]);
+const props = defineProps({
+    comment: {
+        _id: Object,
+        createdBy: Object,
+        date: Date,
+        direct: Number,
+        metrics: Object,
+        text: String,
+    }
+});
 const likedBy = ref(false);
 const unlikedBy = ref(false);
+
+const dateInstance = new Date(props.comment.date);
 
 async function likePost() {
     likedBy.value = !likedBy.value;
@@ -20,7 +29,7 @@ async function dislikePost() {
 <template>
     <div class="comment-header">
         <h2 class="comment-username">{{ comment.createdBy.username }}</h2>
-        <p class="date">{{ comment.date }}</p>
+        <p class="date">{{ dateInstance.toLocaleString('fr-FR') }}</p>
     </div>
     <div class="comment-content">
         <p class="std">{{ comment.text }}</p>

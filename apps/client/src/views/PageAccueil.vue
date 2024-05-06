@@ -30,7 +30,6 @@ const handleNewPostStatus = (status: string) => {
     }
 }
 
-
 onMounted(async () => {
     let userInfo = store.getUserInfo;
 
@@ -39,7 +38,6 @@ onMounted(async () => {
     userIsFactChecker.value = userInfo.isFactChecker === "true" ? true : false;
 
     try {
-
         posts.value = (await axios.get('/posts/getSuggestions')).data.suggestions;
 
         console.log(posts.value)

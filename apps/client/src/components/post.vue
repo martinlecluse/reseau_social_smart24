@@ -28,6 +28,11 @@ const likedBy = ref(false);
 const unlikedBy = ref(false);
 const trustedBy = ref(false);
 const untrustedBy = ref(false);
+let factCheckZero= ref(0);
+let factCheckOne= ref(0);
+let factCheckTwo= ref(0);
+
+const computedFactCheckScore = ref();
 
 const dateInstance = new Date(props.info.date);
 
@@ -46,6 +51,7 @@ const handleFactCheckStatus = (status) => {
 onMounted(async () => {
     metric.value = await getMetrics();
     checkIfUserHasLiked(metric.value);
+    await modifDiagram();
 });
 
 const openCommentsPanel = () => {
@@ -65,6 +71,7 @@ async function getMetrics() {
 async function switchShowFactChecks (){
     showFactChecks.value = !showFactChecks.value;
     metric.value = await getMetrics();
+    await modifDiagram();
     return showFactChecks.value;
 }
 
@@ -123,6 +130,47 @@ function checkIfUserHasLiked(list) {
         untrustedBy.value = true;
     }
 }
+
+async function getProportionFactCheck(){
+
+    let factChecks = (await axios.get(`/posts/${props.info._id}/factChecks`)).data;
+    let nbFactChecks = factChecks.length;
+    factCheckZero.value=0;
+    factCheckOne.value=0;
+    factCheckTwo.value=0;
+    for(let i=0 ; i<factChecks.length ; i++){
+        if(factChecks[i].grade==0){
+            factCheckZero.value=factCheckZero.value+1;
+        }else if(factChecks[i].grade==1){
+            factCheckOne.value=factCheckOne.value+1;
+
+        }else if(factChecks[i].grade==2){
+            factCheckTwo.value=factCheckTwo.value+1;
+        }
+    }
+
+    if(nbFactChecks!=0){
+        factCheckZero.value= factCheckZero.value/nbFactChecks*100;
+        factCheckOne.value= factCheckOne.value/nbFactChecks*100;
+        factCheckTwo.value= factCheckTwo.value/nbFactChecks*100;
+    }
+
+    computedFactCheckScore.value = (factCheckOne.value + 2*factCheckTwo.value)/(factCheckOne.value+factCheckZero.value+factCheckTwo.value);
+    computedFactCheckScore.value = Math.round(computedFactCheckScore.value*10)/2;
+
+}
+
+async function modifDiagram(){
+    await getProportionFactCheck();
+    // Récupérer l'élément de la barre de progression
+    var progressBar = document.getElementById(props.info._id);
+    // Définir le dégradé conique en fonction de la valeur de factCheckScore
+   
+    let myList=[factCheckZero.value,factCheckOne.value,factCheckTwo.value];
+    if(progressBar){
+        progressBar.style.background = `conic-gradient(orange 0% ${myList[0]}% , gray ${myList[0]}% ${myList[0]+myList[1]}%, green ${myList[0]+myList[1]}% ${myList[0]+myList[1]+myList[2]}%)`;
+    }
+}
 </script>
 
 
@@ -141,7 +189,7 @@ function checkIfUserHasLiked(list) {
             </div>
             <div class="post-footer">
                 <div class="post-footer-left"> 
-                    <div v-if="props.userIsFactChecker" class="comment-icon-container">  
+                    <div v-if="props.userIsFactChecker" class="comment-icon-container post-btn-grp">  
                         <button class="post-btn" @click="switchShowFactChecks">
                             <span class="post-btn-icon material-symbols-outlined">verified</span>
                             <span class="post-btn-count">{{metric.nbFactChecks}}</span>
@@ -194,7 +242,13 @@ function checkIfUserHasLiked(list) {
                             <span class="post-btn-count">{{metric.nbComments}}</span>
                         </button>
                     </div>
+
+                    <div v-if="metric.nbFactChecks!=0" class="factCheck-progress-diagram">
+                        <div v-bind:id=props.info._id class="progress-bar" @click="switchShowFactChecks"></div>
+                        <div id="progress">{{computedFactCheckScore}}</div>
+                    </div>
                 </div>
+
                 
                 <div class="post-footer-right">
                     <p class="post-creator-username">
@@ -241,6 +295,38 @@ h1, h2, h3, h4, h5, h6, p {
     display: flex;
     flex-direction: column;
     gap: 24px;
+}
+
+
+.progress-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 5vh;
+  height: 5vh;
+  margin-left: 10vh;
+  border-radius: 50%;
+  color:black;
+  font-size: 1.3rem;
+  font-family: 'Laila', serif;
+
+}
+
+/* .progress-bar::before {
+  counter-reset: var(--progress-value);
+  content: counter(percentage);
+  animation: progress 2s 1 forwards;
+} */
+
+#progress {
+    font-weight: 700;
+    margin-left: 0.5em;
+}
+
+.factCheck-progress-diagram {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .post-content {
