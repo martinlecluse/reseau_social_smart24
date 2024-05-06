@@ -1,4 +1,3 @@
-import { IAlgoParams } from 'src/models/algo/algo-suggestion';
 import { NonStrictObjectId } from '../utils/objectid';
 
 export abstract class AlgoComputer<T> {

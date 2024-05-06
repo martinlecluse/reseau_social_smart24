@@ -1,7 +1,5 @@
 import { AlgoSuggestionComputer, AlgoSuggestionConfig, ItemForComputation } from './algo-suggestions-computer';
-import { IAlgoField, IAlgoFieldOther } from '../../models/algo/algo-field';
-import { Types, Document } from 'mongoose';
-import { IPost } from '../../models/post';
+import { IAlgoFieldOther } from '../../models/algo/algo-field';
 
 export class AlgoSuggestionDefaultComputer<
     Config extends AlgoSuggestionConfig = AlgoSuggestionConfig,

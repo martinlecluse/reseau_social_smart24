@@ -1,11 +1,10 @@
 import { AlgoSuggestionComputer, AlgoSuggestionConfig, ItemForComputation } from './algo-suggestions-computer';
 import { IAlgoField, IAlgoFieldOther } from '../../models/algo/algo-field';
-import { trusted } from 'mongoose';
 
 export interface AlgoSuggestionConfidenceConfig extends AlgoSuggestionConfig {
     similarityCoefficient: number;
     confidenceCoefficient: number;
-    offsetTrustedUsers: number
+    offsetTrustedUsers: number;
 }
 
 export class AlgoSuggestionConfidenceComputer<

@@ -18,7 +18,7 @@ export class AlgoSuggestionFactChecksComputer<
         let secondaryOther: IAlgoFieldOther | undefined;
         let primaryCoefficient: number;
         let secondaryCoefficient: number;
-        let factCheckCoefficient: number = this.config.factCheckCoefficient;
+        const factCheckCoefficient: number = this.config.factCheckCoefficient;
 
         if (this.config.selectUserType === 'confidence') {
             primaryOther = confidenceOther;
@@ -41,7 +41,9 @@ export class AlgoSuggestionFactChecksComputer<
         if (primaryOther) {
             if (secondaryOther) {
                 return (
-                    (primaryOther.score / primaryCoefficient + secondaryOther.score / secondaryCoefficient + factCheckScore / factCheckCoefficient) /
+                    (primaryOther.score / primaryCoefficient +
+                        secondaryOther.score / secondaryCoefficient +
+                        factCheckScore / factCheckCoefficient) /
                     (primaryCoefficient + secondaryCoefficient)
                 );
             } else {

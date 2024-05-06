@@ -53,7 +53,7 @@ export class FactCheckService {
         await this.userService.updateUser(userId, { $inc: { nbFactChecked: 1 } });
 
         const postId = new Types.ObjectId(newFactCheck.postId);
-        const metricsId =  await this.postService.getMetricsId(postId);
+        const metricsId = await this.postService.getMetricsId(postId);
         await this.metricsService.addFactCheck(metricsId, factCheck._id, factCheck.grade);
 
         return factCheck;

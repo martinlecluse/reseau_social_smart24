@@ -1,8 +1,5 @@
 import { IAlgoFieldOther } from '../../models/algo/algo-field';
-import { AlgoSuggestionDefaultComputer } from './algo-suggestions-default-computer';
-import { AlgoSuggestionConfig, ItemForComputation } from './algo-suggestions-computer';
-import { Types, Document } from 'mongoose';
-import { IPost } from '../../models/post';
+import { ItemForComputation } from './algo-suggestions-computer';
 import { AlgoSuggestionConfidenceComputer, AlgoSuggestionConfidenceConfig } from './algo-suggestion-conf-computer';
 
 export class AlgoSuggestionReconfComputer<
