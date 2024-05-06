@@ -163,9 +163,7 @@ function modifDiagram(){
    
     let myList=[factCheckZero.value,factCheckOne.value,factCheckTwo.value];
 
-    myList.sort((a, b) => a - b);
-
-    if(factCheckOne==0 && factCheckTwo==0 && factCheckZero==0){
+    if(factCheckOne.value==0 && factCheckTwo.value==0 && factCheckZero.value==0){
         progressBar.style.backgroundColor = "gray";
     }else{
         progressBar.style.background = `conic-gradient(orange 0% ${myList[0]}% , gray ${myList[0]}% ${myList[0]+myList[1]}%, green ${myList[0]+myList[1]}% ${myList[0]+myList[1]+myList[2]}%)`;
