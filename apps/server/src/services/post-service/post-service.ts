@@ -35,7 +35,7 @@ export class PostService {
 
     async publishComment(userId: NonStrictObjectId, newComment: ICreateComment): Promise<Document & IPost> {
         await this.userService.getUser(userId);
-        await this.getPost(newComment.parentPostId.toString());
+        const post = await this.getPost(newComment.parentPostId.toString());
 
         const metrics = new Metrics({});
         await metrics.save();
@@ -49,6 +49,7 @@ export class PostService {
         });
 
         await comment.save();
+        Metrics.findOneAndUpdate(post.metrics, { $inc: { nbComments: 1 } });
 
         return comment;
     }
@@ -86,7 +87,10 @@ export class PostService {
 
     async getSuggestions(userId: NonStrictObjectId) {
         let suggestions: IPost[] = [];
-        const suggestionsIds: IAlgoSuggestionOther[] = (await AlgoSuggestion.findOne({ user: userId }))!.others.slice(0, 200);
+        const suggestionsIds: IAlgoSuggestionOther[] = (await AlgoSuggestion.findOne({ user: userId }))!.others.slice(
+            0,
+            200,
+        );
 
         await Promise.all(
             suggestionsIds.map(async (so: IAlgoSuggestionOther) => {
