@@ -117,6 +117,10 @@ async function unTrustUser(){
 </template>
 
 <style scoped>
+  .content {
+    padding-top: 70px;
+  }
+
   .user-profile-container {
     display: flex;
     flex-direction: row;

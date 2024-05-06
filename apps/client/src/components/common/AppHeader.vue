@@ -19,7 +19,9 @@ const logout = () => {
             <AppLogo size="40px"/>
             <div class="info-user">
                 <div class="info-user-avatar"></div>
-                <span class="info-user-username">{{ userInfoStore.getUserInfo.username }}</span>
+                <router-link :to="{ name: 'profile', params: { profileId: userInfoStore.getUserInfo._id } }">
+                    <span class="info-user-username">{{ userInfoStore.getUserInfo.username }}</span>
+                </router-link>
             </div>
         </div>
 
