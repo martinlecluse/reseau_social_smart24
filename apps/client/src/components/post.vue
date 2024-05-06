@@ -199,7 +199,7 @@ function checkIfUserHasLiked(list) {
         </div>
     </div>
     <div v-if="loadComments">
-        <modal><FeedComment :parentPostId="info._id" @comment-sent="closeFeedComment"></FeedComment></modal>
+        <modal @close="closeFeedComment"><FeedComment :parentPostId="info._id" @comment-sent="closeFeedComment"></FeedComment></modal>
     </div>
 
 
