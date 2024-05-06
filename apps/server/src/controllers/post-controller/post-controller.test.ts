@@ -102,6 +102,7 @@ describe('PostController', () => {
     describe('POST /post/comment', () => {
         it('should create comment', async () => {
             const metrics = new Metrics({});
+	await metrics.save();
             DEFAULT_POST.metrics = metrics._id;
             const post = new Post(DEFAULT_POST);
             await post.save();
