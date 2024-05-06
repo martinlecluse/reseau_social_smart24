@@ -7,6 +7,7 @@ import  { ref } from 'vue'
 import { useTokenStore } from '../stores/auth'
 import { computed } from "vue";
 import AppHeader from "@/components/common/AppHeader.vue";
+import AppLayout from "@/components/common/AppLayout.vue";
 
 const loaded = ref(false);
 
@@ -60,123 +61,59 @@ onMounted(async () => {
 </script>
 
 <template>
-    <AppHeader></AppHeader>
+    <AppLayout>
+        <div class="content" v-if="loaded">
+            <section>
+                <h1 class="section-title">Profile</h1>
 
-    <div class="content" v-if="loaded">
-        <section>
-            <h1 class="section-title">Profile</h1>
+                <div class="subsection">
+                    <h2 class="subsection-title">Personal information</h2>
+                    
+                    <div class="field">
+                        <p class="field-title">Name</p>
+                        <input class="field-content" disabled :value="userData.name + ' ' + userData.surname" />
+                    </div>
+                    <div class="field">
+                        <p class="field-title">Email</p>
+                        <input class="field-content" disabled :value="userData.mail" />
+                    </div>
+                    <div class="field" v-if="userData.factChecker">
+                        <p class="field-title">Organization</p>
+                        <input class="field-content" disabled :value="userData.organization" />
+                    </div>
+                </div>
+            </section>
 
-            <div class="subsection">
-                <h2 class="subsection-title">Personal information</h2>
+            <section>
+                <h1 class="section-title">Settings</h1>
+
+                <p class="std text">Here, you can choose the way you want the public feed to look like</p>
+                <div class="subsection">
+                    <h2 class="subsection-title">Feed</h2>
+
+                    <div>
+                        <div class="field">
+                            <p class="field-title">Fact-checking <span class="field-value">{{newFactCheckedRate}} %</span></p>
+                            <input class="field-content" type="range" min="0" max="100" step="10" :value="newFactCheckedRate" @change="handleFactCheckRateChange" @input="handleFactCheckRateChange" />
+                        </div>
+                        <p class="field-info">Set the rate of fact-checked posts in your feed</p>
+                    </div>
+                    <div>
+                        <div class="field">
+                            <p class="field-title">Diversity <span class="field-value">{{newDiversityRate}} %</span></p>
+                            <input class="field-content" type="range" min="0" max="100" step="10" :value="newDiversityRate" @change="handleDiversityRateChange" @input="handleDiversityRateChange" />
+                        </div>
+                        <p class="field-info">Set the rate of posts that will be out of your current interest centers (sounds exciting !)</p>
+                    </div>
+                </div>
                 
-                <div class="field">
-                    <p class="field-title">Name</p>
-                    <input class="field-content" disabled :value="userData.name + ' ' + userData.surname" />
+                <div class="submit">
+                    <button class="btn btn-primary" @click="updateUserParams" :disabled="!changed">Save</button>
+                    <p class="submit-message">{{ savedMessage }}</p>
                 </div>
-                <div class="field">
-                    <p class="field-title">Email</p>
-                    <input class="field-content" disabled :value="userData.mail" />
-                </div>
-                <div class="field" v-if="userData.factChecker">
-                    <p class="field-title">Organization</p>
-                    <input class="field-content" disabled :value="userData.organization" />
-                </div>
-            </div>
-        </section>
-
-        <section>
-            <h1 class="section-title">Settings</h1>
-
-            <p class="std text">Here, you can choose the way you want the public feed to look like</p>
-            <div class="subsection">
-                <h2 class="subsection-title">Feed</h2>
-
-                <div>
-                    <div class="field">
-                        <p class="field-title">Fact-checking <span class="field-value">{{newFactCheckedRate}} %</span></p>
-                        <input class="field-content" type="range" min="0" max="100" step="10" :value="newFactCheckedRate" @change="handleFactCheckRateChange" @input="handleFactCheckRateChange" />
-                    </div>
-                    <p class="field-info">Set the rate of fact-checked posts in your feed</p>
-                </div>
-                <div>
-                    <div class="field">
-                        <p class="field-title">Diversity <span class="field-value">{{newDiversityRate}} %</span></p>
-                        <input class="field-content" type="range" min="0" max="100" step="10" :value="newDiversityRate" @change="handleDiversityRateChange" @input="handleDiversityRateChange" />
-                    </div>
-                    <p class="field-info">Set the rate of posts that will be out of your current interest centers (sounds exciting !)</p>
-                </div>
-            </div>
-            
-            <div class="submit">
-                <button class="btn btn-primary" @click="updateUserParams" :disabled="!changed">Save</button>
-                <p class="submit-message">{{ savedMessage }}</p>
-            </div>
-        </section>
-
-
-        <!-- <div v-if="loaded" class="panel profile">
-            <div class="info">
-                <h1 class="std title1">Profile</h1>
-                <div class="section user-info">
-                    <h2 class="std title2">Personal information</h2>
-                    <div class="section-content">
-                        <p class="std text"><span class="std accent-bold">Name :</span> {{ userData.name }} {{ userData.surname }}</p>
-                        <p class="std text"><span class="std accent-bold">E-mail :</span> {{ userData.mail }}</p>
-                        <div v-if="userData.factChecker === true" class="fact-checker-info">
-                            <h3 class="std title3">Recognized fact-checker</h3>
-                            <p class="std text"><span class="std accent-bold">Organization :</span> {{ userData.organization }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="section params">
-                    <h2 class="std title2">Settings</h2>
-                    <div class="section-content">
-                        <p class="std text">Here, you can choose the way you want the public feed to look like</p>
-                        <div class="select-param">
-                            <p class="std text accent-bold">Fact-checking of the feed : {{ userData.parameters.rateFactChecked }} %</p>
-                            <p class="std text accent-italic">Set the rate of fact-checked posts in your feed</p>
-                            <div class="set-param">
-                                <div class="btn-group btn-group-toggle" role="group" data-toggle="buttons">
-                                    <button class="btn btn-primary" id="not-selected" @click="updateFactCheckRate(0, $event)">0</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateFactCheckRate(10, $event)">10</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateFactCheckRate(20, $event)">20</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateFactCheckRate(30, $event)">30</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateFactCheckRate(40, $event)">40</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateFactCheckRate(50, $event)">50</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateFactCheckRate(60, $event)">60</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateFactCheckRate(70, $event)">70</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateFactCheckRate(80, $event)">80</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateFactCheckRate(90, $event)">90</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateFactCheckRate(100, $event)">100</button>
-                                </div>
-                            </div>
-                            <div class="validate-button"><button class="btn btn-primary" @click="updateUserParams">Valider</button></div>
-                        </div>
-                        <div class="select-param">
-                            <p class="std text accent-bold">Diversity of the feed : {{ userData.parameters.rateDiversification }} %</p>
-                            <p class="std text accent-italic">Set the rate of posts that will be out of your current interest centers (sounds exciting !)</p>
-                            <div class="set-param">
-                                <div class="btn-group btn-group-toggle" role="group" data-toggle="buttons">
-                                    <button class="btn btn-primary" id="not-selected" @click="updateDiversityRate(0, $event)">0</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateDiversityRate(10, $event)">20</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateDiversityRate(20, $event)">20</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateDiversityRate(30, $event)">30</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateDiversityRate(40, $event)">40</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateDiversityRate(50, $event)">50</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateDiversityRate(60, $event)">60</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateDiversityRate(70, $event)">70</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateDiversityRate(80, $event)">80</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateDiversityRate(90, $event)">90</button>
-                                    <button class="btn btn-primary" id="not-selected" @click="updateDiversityRate(100, $event)">100</button>
-                                </div>
-                            </div>
-                            <div class="validate-button"><button class="btn btn-primary" @click="updateUserParams">Valider</button></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-    </div>
+            </section>
+        </div>
+    </AppLayout>
 </template>
 
 <style scoped>
@@ -186,13 +123,10 @@ h1, h2, h3, h4, h5, h6, p {
 }
 
 .content {
-    padding-top: 70px;
     display: flex;
     flex-direction: column;
     gap: 24px;
-    padding: 94px 12px 24px 12px;
-    max-width: 800px;
-    margin: 0 auto;
+    padding: 24px 12px;
 }
 
 section {

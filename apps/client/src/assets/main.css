@@ -1,21 +1,23 @@
-
-
-.main{
-  width:100%;
-  height:100%;
-  display: flex;
-  align-items: center;
-  background-image: linear-gradient(to bottom, #f7e1e1 50%, #B9ABAB 100%);
+body {
+  position: relative;
+  background: none !important;
 }
 
-.panel {
-  background-color: white;
-  margin: 1em 0 1em 0;
-  padding: 1em 0 1em 0;
+.background {
+  position: fixed;
+  background:linear-gradient(rgb(245, 245, 248), rgb(233, 233, 237));
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: -1;
+  background-size: cover;
+  opacity: 0.4;
+}
 
-  width: 80%;
-
-  border-radius: 20px;
+.laila{
+  font-family: "Laila", serif;
+  font-style: normal;
 }
 
 .std.text {
@@ -43,4 +45,94 @@
 
 .std.accent-italic {
   font-style: italic;
+}
+
+.div-h1{
+  font-size: 5rem;
+  font-weight: 700;
+}
+
+.div-p{
+  margin-top: 6vh;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+
+/* ===== */
+
+.post-btn {
+  display: flex;
+  align-items: center;
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 4px 12px;
+  gap: 6px;
+  border: solid 1px rgb(202, 202, 202);
+  border-radius: 100px;
+  outline: none;
+  color: rgba(0, 0, 0, 0.8);
+  transition: ease-in background-color 0.1s;
+}
+
+.post-btn:hover {
+  background-color: rgb(236, 236, 236);
+}
+
+.post-btn:focus {
+  outline: none;
+}
+
+.post-btn-green {
+  color: rgb(49, 154, 96);
+  background-color: rgb(236, 255, 245);
+}
+
+.post-btn-green:hover {
+  background-color: rgb(211, 238, 224);
+}
+
+.post-btn-red {
+  color: rgb(242, 81, 53);
+  background-color: rgb(255, 244, 242);
+}
+
+.post-btn-red:hover {
+  background-color: rgb(240, 224, 221);
+}
+
+.post-btn-icon {
+  font-size: 1.2rem;
+  transition: ease-in scale 0.1s;
+}
+
+.post-btn:hover .post-btn-icon {
+  scale: 1.075;
+}
+
+.post-btn:active .post-btn-icon {
+  scale: 0.925;
+}
+
+.post-btn-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0.75;
+  width: 1em;
+}
+
+.post-btn-grp {
+  display: flex;
+}
+
+.post-btn-grp .post-btn:not(:first-child) {
+  border-left: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.post-btn-grp .post-btn:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
