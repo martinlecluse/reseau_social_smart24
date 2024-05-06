@@ -14,6 +14,7 @@ const props = defineProps({
         direct: Number,
         metrics: Object,
         text: String,
+        factChecks: Array,
     },
     userIsFactChecker: Boolean
 });
@@ -28,6 +29,8 @@ const likedBy = ref(false);
 const unlikedBy = ref(false);
 const trustedBy = ref(false);
 const untrustedBy = ref(false);
+const factCheckOne= ref('');
+
 
 const dateInstance = new Date(props.info.date);
 
@@ -122,6 +125,28 @@ function checkIfUserHasLiked(list) {
         untrustedBy.value = true;
     }
 }
+
+function getProportionFactCheck(){
+
+    let nbFactChecks = props.info.factChecks.length;
+
+    for(let i=0 ; i<nbFactChecks ; i++){
+        if(props.info.factChecks[i].status === "true"){
+            factCheckScore++;
+        }
+    }
+}
+
+// Récupérer l'élément de la barre de progression
+var progressBar = document.getElementById("progressBar");
+
+// Récupérer l'élément de progression
+var progressElement = document.getElementById("progress");
+
+// Définir le dégradé conique en fonction de la valeur de factCheckScore
+progressBar.style.background = "conic-gradient(#green 0deg , #4caf50 " + factCheckScore + "%, #f2f2f2 " + factCheckScore + "%)";
+
+
 </script>
 
 
@@ -194,8 +219,8 @@ function checkIfUserHasLiked(list) {
                         </button>
                     </div>
 
-                    <div class="progress-bar">
-                        <progress value={{metric.factCheckScore}} min="0" max="100" style="visibility:hidden;height:0;width:0;">{{ metric.factCheckScore }}</progress>
+                    <div id=progressBar class="progress-bar">
+                        <div id="progress">{{metric.factCheckScore}}</div>
                     </div>
 
                 </div>
@@ -244,34 +269,27 @@ h1, h2, h3, h4, h5, h6, p {
     gap: 24px;
 }
 
-@property --progress-value {
-  syntax: "<integer>";
-  initial-value: 0;
-  inherits: false;
-}
-
-@keyframes progress {
- to { --progress-value: 40%; }
-}
 
 .progress-bar {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left:16vh;
+  margin-left:23vh;
   width: 5vh;
   height: 5vh;
   border-radius: 50%;
-  background: 
-    conic-gradient(green 40%, red 6);
-  animation: progress 2s 1 forwards;
+  color:black;
+  font-size: 1.3rem;
+  font-family: 'Laila', serif;
+  background: conic-gradient(green 120deg, gray 120deg 240deg,red 240deg 360deg); 
+
 }
 
-.progress-bar::before {
+/* .progress-bar::before {
   counter-reset: var(--progress-value);
   content: counter(percentage);
   animation: progress 2s 1 forwards;
-}
+} */
 
 
 
