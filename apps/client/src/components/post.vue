@@ -52,8 +52,9 @@ const openCommentsPanel = () => {
     loadComments.value = true
 }
 
-const closeFeedComment = () => {
+const closeFeedComment = async () => {
     loadComments.value = false;
+    metric.value = await getMetrics();
 }
 
 async function getMetrics() {

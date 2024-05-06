@@ -49,7 +49,8 @@ export class PostService {
         });
 
         await comment.save();
-        Metrics.findOneAndUpdate(post.metrics, { $inc: { nbComments: 1 } });
+        console.log(post.metrics);
+        await Metrics.findOneAndUpdate(post.metrics._id, { $inc: { nbComments: 1 } });
 
         return comment;
     }
