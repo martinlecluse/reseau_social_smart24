@@ -8,18 +8,19 @@ Students: BONDYFALAT Julien, BOYER Thomas, FAYALA Mohamed, LECLUSE Martin, MOUYS
 
 ### Abstract
 
-Concerned by the miscellaneous use of social networks to spread false information, we aim to create the prototype of a news social network, in which the content proposals made by the algorithm will promote true information and dismiss false one.
+Soucieux de promouvoir un accès à l'information plus éclairé, nous proposons Husky, une application qui promeut des informations en lesquelles vous avez confiance dans votre fil d'actualité. L'application vous permet également de paramétrer votre fil d'actualité pour que l'algorithme vous propose des contenu vérifiés et/ou diversifiés.
 
 ## Description 
 
-Our social network will implement a "trust design" on top a a classical content proposal algorithm only based on the likes. It will consist of a set of fonctionnalities (such as "I trust/don't trust this content", "I trust/don't trust this user") and user roles (s.a. <em>fact-checkers</em>), which will allow us to transform the order of the recommended contents for each user. The goal is of course to find a design that, by letting it run, will promote real information.
+Husky implémente des mécanismes de confiance qui impactent l'algorithme de recommandations pour proposer des posts qui correspondent mieux à ce en quoi l'utilisateur à confiance.
+Nous proposons des fonctionnalités qui permettent d'indiquer sa confiance (ou au contraire sa méfiance) dans le contenu des posts, mais aussi envers le contenu publié par un autre utilisateur. Husky intègre aussi des fact-checkers, des journalistes accrédités qui peuvent évaluer la justesse des informations publiées. Par la suite, ces vérificatons sont accessibles entièrement par tous les utilisateurs.
 
-By doing this way, we avoid the necessity of looking into the contents of the posts, which would create lots of problems on an ethical level, and probably kill the trust of the user in our social network.
+Ces mécanismes nous permettent d'intégrer la confiance des utilisateurs envers le contenu dans nos algorithmes de recommandation, tout en évitant l'écueil de consulter nous-mêmes le contenu des posts, ce qui poserait des problèmes éthiques évidents.
 
 ## Project Goal
 
-The goal of our project is to build a fonctional prototype of our social network, and to show with simulations that our design is better than a algorithm based only on likes for the promotionof true information.
-For that, we will use a dataset of newws, for which we know the true ones and the <em>fake news</em>, and custom indicators, in order to compare a scenario run on different implementations of the "trust design"
+Notre objectif est de développer un prototype de Husky qui implémente les fonctionnalités liées à la confiance, puis de montrer, avec des simulations, l'impact de notre algorithme sur les recommandations des utilisateurs.
+Pour cela, nous développerons plusieurs versions de notre algorithme de recommandations, afin de pouvoir comparer leurs effets.
 
 ## Requirements
 
